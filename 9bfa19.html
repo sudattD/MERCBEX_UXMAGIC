@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" style="height: auto; min-height: 100%;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MERCBEX – Crop Scan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link id="heading-font-link" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link id="body-font-link" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['var(--font-heading-name)', 'sans-serif'],
+            body: ['var(--font-body-name)', 'sans-serif'],
+          },
+          spacing: {
+            base: 'var(--space-base)',
+          },
+          borderRadius: {
+            small: 'var(--radius-small)',
+            large: 'var(--radius-large)',
+          },
+          boxShadow: {
+            custom: 'var(--shadow-custom)',
+            'custom-hover': 'var(--shadow-custom-hover)',
+          },
+          colors: {
+            brand: {
+              dark: '#0F3D22',
+              mid: '#1A5C34',
+              light: '#2A7A48',
+              lime: '#A8E63D',
+              'lime-bright': '#C4F135',
+              'lime-soft': '#D4F76A',
+              'lime-pale': '#E8FBAA',
+            }
+          },
+          keyframes: {
+            progressLine: {
+              '0%': { width: '0%' },
+              '100%': { width: '100%' },
+            },
+            glowPulse: {
+              '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+              '50%': { opacity: '1', transform: 'scale(1.08)' },
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(24px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% center' },
+              '100%': { backgroundPosition: '200% center' },
+            },
+            ringExpand: {
+              '0%': { transform: 'scale(0.85)', opacity: '0.8' },
+              '100%': { transform: 'scale(1.35)', opacity: '0' },
+            }
+          },
+          animation: {
+            progressLine: 'progressLine 3.2s cubic-bezier(0.4,0,0.2,1) forwards',
+            glowPulse: 'glowPulse 2.8s ease-in-out infinite',
+            fadeUp: 'fadeUp 0.9s ease-out forwards',
+            'fadeUp-delay': 'fadeUp 0.9s ease-out 0.4s forwards',
+            'fadeUp-delay2': 'fadeUp 0.9s ease-out 0.7s forwards',
+            shimmer: 'shimmer 2.5s linear infinite',
+            ringExpand: 'ringExpand 2.4s ease-out infinite',
+            'ringExpand-delay': 'ringExpand 2.4s ease-out 1.2s infinite',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --font-heading-name: 'Syne';
+      --font-body-name: 'DM Sans';
+      --font-heading: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --letter-spacing-heading: 0.5px;
+      --letter-spacing-body: 0px;
+
+      --space-base: 1rem;
+
+      --radius-small: 6px;
+      --radius-large: 16px;
+      --border-width: 1.5px;
+
+      --shadow-color: 168 230 61;
+      --shadow-offset-x: 0px;
+      --shadow-offset-y: 0px;
+      --shadow-blur: 48px;
+      --shadow-spread: 0px;
+      --shadow-opacity: 0.35;
+      --shadow-custom: 0px 0px 48px 0px rgba(168, 230, 61, 0.35);
+      --shadow-custom-hover: 0px 0px 72px 0px rgba(168, 230, 61, 0.55);
+    }
+
+    .logo-glow {
+      filter: drop-shadow(0 0 32px rgba(168, 230, 61, 0.7)) drop-shadow(0 0 64px rgba(168, 230, 61, 0.35));
+    }
+
+    .shimmer-text {
+      background: linear-gradient(90deg, #A8E63D 0%, #C4F135 30%, #ffffff 50%, #C4F135 70%, #A8E63D 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+    }
+
+    .progress-track {
+      background: rgba(168, 230, 61, 0.15);
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #A8E63D, #C4F135, #A8E63D);
+      box-shadow: 0 0 12px rgba(168, 230, 61, 0.8), 0 0 24px rgba(168, 230, 61, 0.4);
+      animation: progressLine 3.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .ring-1-anim {
+      animation: ringExpand 2.4s ease-out infinite;
+    }
+
+    .ring-2-anim {
+      animation: ringExpand 2.4s ease-out 1.2s infinite;
+    }
+
+    .tagline-hindi {
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Scan bracket corner animation */
+    @keyframes bracketPulse {
+      0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 6px rgba(168,230,61,0.6)); }
+      50% { opacity: 1; filter: drop-shadow(0 0 16px rgba(168,230,61,1)) drop-shadow(0 0 32px rgba(168,230,61,0.5)); }
+    }
+    .bracket-anim {
+      animation: bracketPulse 2s ease-in-out infinite;
+    }
+
+    /* Scan line sweep */
+    @keyframes scanLineSweep {
+      0% { top: 10%; opacity: 0.9; }
+      48% { opacity: 0.9; }
+      50% { top: 90%; opacity: 0.9; }
+      52% { opacity: 0; }
+      53% { top: 10%; opacity: 0; }
+      55% { opacity: 0.9; }
+      100% { top: 90%; opacity: 0.9; }
+    }
+    .scan-line {
+      animation: scanLineSweep 3s ease-in-out infinite;
+    }
+
+    /* Frosted glass bottom panel */
+    .frosted-panel {
+      background: rgba(10, 30, 15, 0.82);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border-top: 1px solid rgba(168, 230, 61, 0.18);
+    }
+
+    /* Capture button */
+    .capture-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #A8E63D 0%, #C4F135 100%);
+      border: 4px solid rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 32px rgba(168,230,61,0.55), 0 4px 24px rgba(0,0,0,0.4);
+      transition: all 0.18s ease;
+      position: relative;
+    }
+    .capture-btn::after {
+      content: '';
+      position: absolute;
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      border: 2px solid rgba(168,230,61,0.35);
+      animation: ringExpand 2s ease-out infinite;
+    }
+    .capture-btn:active {
+      transform: scale(0.93);
+      box-shadow: 0 0 16px rgba(168,230,61,0.4);
+    }
+
+    /* Icon button (gallery, flash) */
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .icon-btn:hover {
+      background: rgba(168,230,61,0.18);
+      border-color: rgba(168,230,61,0.4);
+    }
+    .icon-btn.active {
+      background: rgba(168,230,61,0.22);
+      border-color: #A8E63D;
+    }
+
+    /* Dot pulse */
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .dot-pulse { animation: dotPulse 1.5s ease-in-out infinite; }
+
+    /* Fade in */
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-12px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-down { animation: fadeInDown 0.5s ease-out forwards; }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-up { animation: fadeInUp 0.5s ease-out 0.2s forwards; opacity: 0; }
+
+    /* Camera viewfinder overlay */
+    .viewfinder-overlay {
+      background: rgba(0,0,0,0.45);
+    }
+
+    /* Crop badge */
+    .crop-badge {
+      background: rgba(10, 30, 15, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(168,230,61,0.45);
+      border-radius: 20px;
+      padding: 5px 12px 5px 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* AI processing indicator */
+    @keyframes aiScan {
+      0% { width: 0%; }
+      60% { width: 85%; }
+      80% { width: 85%; }
+      100% { width: 100%; }
+    }
+    .ai-scan-bar {
+      animation: aiScan 2.8s ease-in-out infinite;
+    }
+
+    /* Scrollbar hide */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Tip card */
+    .tip-card {
+      background: rgba(10, 30, 15, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(168,230,61,0.2);
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body class="font-body" style="height: auto; min-height: 100%; background-color: #0A1A0D;">
+
+  <div style="max-width: 430px; margin: 0 auto; position: relative; background: #0A1A0D; overflow: hidden;">
+
+    <!-- ===== FULL-SCREEN CAMERA VIEWFINDER ===== -->
+    <div style="position: relative; width: 100%; height: 780px; overflow: hidden;">
+
+      <!-- Camera background image (simulated viewfinder) -->
+      <img src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=430&h=780&fit=crop&crop=center" alt="Camera viewfinder" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;">
+
+      <!-- Dark vignette overlay -->
+      <div style="position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 30%, rgba(0,0,0,0.65) 100%);"></div>
+
+      <!-- Top dark gradient -->
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 180px; z-index: 2; background: linear-gradient(to bottom, rgba(5,15,8,0.88) 0%, rgba(5,15,8,0.4) 60%, transparent 100%);"></div>
+
+      <!-- Bottom dark gradient -->
+      <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 220px; z-index: 2; background: linear-gradient(to top, rgba(5,15,8,0.95) 0%, rgba(5,15,8,0.5) 60%, transparent 100%);"></div>
+
+      <!-- ===== TOP BAR ===== -->
+      <div class="fade-in-down" style="position: absolute; top: 0; left: 0; right: 0; z-index: 10; padding: 44px 20px 16px;">
+        <div class="flex items-center justify-between">
+
+          <!-- Back button -->
+          <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/home-dashboard" style="text-decoration: none; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px);">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M11 4L6 9L11 14" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+
+          <!-- Center title -->
+          <div class="flex flex-col items-center gap-1">
+            <div class="flex items-center gap-2">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #A8E63D;" class="dot-pulse"></div>
+              <h1 class="font-heading" style="font-size: 15px; font-weight: 700; color: #FFFFFF; letter-spacing: 1px;">CROP SCAN</h1>
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #A8E63D;" class="dot-pulse"></div>
+            </div>
+            <!-- AI status bar -->
+            <div style="width: 100px; height: 2px; background: rgba(168,230,61,0.2); border-radius: 1px; overflow: hidden;">
+              <div class="ai-scan-bar" style="height: 100%; background: linear-gradient(90deg, #A8E63D, #C4F135); border-radius: 1px;"></div>
+            </div>
+          </div>
+
+          <!-- Active crop badge (top-right) -->
+          <div class="crop-badge">
+            <div style="width: 22px; height: 22px; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
+              <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=44&h=44&fit=crop" alt="Wheat" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div>
+              <p class="font-heading" style="font-size: 10px; font-weight: 700; color: #A8E63D; letter-spacing: 0.5px; line-height: 1;">Wheat</p>
+              <p class="font-body" style="font-size: 8px; color: rgba(168,230,61,0.6); line-height: 1; margin-top: 1px;">Active Crop</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== SCAN FRAME AREA ===== -->
+      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -52%); z-index: 5; width: 260px; height: 260px;">
+
+        <!-- Corner brackets - Top Left -->
+        <div class="bracket-anim" style="position: absolute; top: 0; left: 0; width: 44px; height: 44px;">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M2 22V4C2 2.9 2.9 2 4 2H22" stroke="#A8E63D" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Corner brackets - Top Right -->
+        <div class="bracket-anim" style="position: absolute; top: 0; right: 0; width: 44px; height: 44px;">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M22 2H40C41.1 2 42 2.9 42 4V22" stroke="#A8E63D" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Corner brackets - Bottom Left -->
+        <div class="bracket-anim" style="position: absolute; bottom: 0; left: 0; width: 44px; height: 44px;">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M2 22V40C2 41.1 2.9 42 4 42H22" stroke="#A8E63D" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Corner brackets - Bottom Right -->
+        <div class="bracket-anim" style="position: absolute; bottom: 0; right: 0; width: 44px; height: 44px;">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M22 42H40C41.1 42 42 41.1 42 40V22" stroke="#A8E63D" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- Scan line sweep -->
+        <div class="scan-line" style="position: absolute; left: 8px; right: 8px; height: 2px; background: linear-gradient(90deg, transparent 0%, rgba(168,230,61,0.3) 15%, #A8E63D 50%, rgba(168,230,61,0.3) 85%, transparent 100%); box-shadow: 0 0 12px rgba(168,230,61,0.8), 0 0 24px rgba(168,230,61,0.4); border-radius: 1px;"></div>
+
+        <!-- Center crosshair dot -->
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; border-radius: 50%; background: rgba(168,230,61,0.7); box-shadow: 0 0 12px rgba(168,230,61,0.9);"></div>
+
+        <!-- Subtle inner frame -->
+        <div style="position: absolute; inset: 20px; border: 1px solid rgba(168,230,61,0.12); border-radius: 4px;"></div>
+
+      </div>
+
+      <!-- ===== INSTRUCTIONAL TEXT (Bilingual) ===== -->
+      <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, 90px); z-index: 6; text-align: center; width: 280px;">
+        <!-- English -->
+        <p class="font-body" style="font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.88); letter-spacing: 0.3px; line-height: 1.5; text-shadow: 0 1px 8px rgba(0,0,0,0.8);">
+          Position the affected leaf or crop<br>within the frame to scan
+        </p>
+        <!-- Divider -->
+        <div class="flex items-center justify-center gap-2 my-2">
+          <div style="height: 1px; width: 28px; background: rgba(168,230,61,0.35);"></div>
+          <div style="width: 3px; height: 3px; border-radius: 50%; background: rgba(168,230,61,0.55);"></div>
+          <div style="height: 1px; width: 28px; background: rgba(168,230,61,0.35);"></div>
+        </div>
+        <!-- Hindi -->
+        <p class="font-body" style="font-size: 12px; font-weight: 400; color: rgba(168,230,61,0.8); letter-spacing: 0.2px; line-height: 1.6; text-shadow: 0 1px 8px rgba(0,0,0,0.8);">
+          प्रभावित पत्ती या फसल को फ्रेम में<br>रखें और स्कैन करें
+        </p>
+      </div>
+
+      <!-- ===== TIP CARD (floating) ===== -->
+      <div style="position: absolute; top: 130px; left: 20px; right: 20px; z-index: 8;" class="fade-in-down">
+        <div class="tip-card flex items-center gap-3 px-4 py-3">
+          <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(168,230,61,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="#A8E63D" stroke-width="1.3"/>
+              <path d="M7 5V7.5" stroke="#A8E63D" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="7" cy="9.5" r="0.7" fill="#A8E63D"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <p class="font-body" style="font-size: 10.5px; color: rgba(255,255,255,0.75); line-height: 1.4;">Ensure good lighting for accurate AI detection · अच्छी रोशनी में स्कैन करें</p>
+          </div>
+          <button onclick="this.parentElement.parentElement.style.display='none'" style="background: none; border: none; cursor: pointer; padding: 2px; opacity: 0.5;">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 2L10 10M10 2L2 10" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== BOTTOM FROSTED PANEL ===== -->
+      <div class="frosted-panel fade-in-up" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 10; padding: 20px 28px 36px;">
+
+        <!-- Mode selector tabs -->
+        <div class="flex items-center justify-center gap-1 mb-5">
+          <button onclick="setMode(this, 'disease')" class="mode-tab active-mode font-body" style="padding: 5px 16px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #0F3D22; background: #A8E63D; border: none; cursor: pointer; letter-spacing: 0.3px; transition: all 0.2s;">Disease Scan</button>
+          <button onclick="setMode(this, 'identify')" class="mode-tab font-body" style="padding: 5px 16px; border-radius: 20px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); cursor: pointer; letter-spacing: 0.3px; transition: all 0.2s;">Identify Crop</button>
+          <button onclick="setMode(this, 'pest')" class="mode-tab font-body" style="padding: 5px 16px; border-radius: 20px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); cursor: pointer; letter-spacing: 0.3px; transition: all 0.2s;">Pest Check</button>
+        </div>
+
+        <!-- Main controls row -->
+        <div class="flex items-center justify-between">
+
+          <!-- Gallery button -->
+          <div class="flex flex-col items-center gap-2">
+            <button class="icon-btn" id="galleryBtn" onclick="openGallery()">
+              <!-- Gallery thumbnail preview -->
+              <div style="width: 36px; height: 36px; border-radius: 8px; overflow: hidden; border: 1.5px solid rgba(168,230,61,0.4);">
+                <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=72&h=72&fit=crop" alt="Gallery" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+            </button>
+            <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.45); letter-spacing: 0.3px;">Gallery</span>
+          </div>
+
+          <!-- Capture button (center) -->
+          <div class="flex flex-col items-center gap-2">
+            <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/disease-detection-result" style="text-decoration: none;">
+              <button class="capture-btn" id="captureBtn">
+                <!-- Inner white circle -->
+                <div style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #C4F135 0%, #A8E63D 100%); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 4px rgba(255,255,255,0.4);">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="2" width="20" height="20" rx="4" stroke="#0F3D22" stroke-width="2"/>
+                    <path d="M2 8H6M2 16H6M18 2V6M18 18V22" stroke="#0F3D22" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="12" cy="12" r="3.5" stroke="#0F3D22" stroke-width="1.8"/>
+                    <circle cx="12" cy="12" r="1.2" fill="#0F3D22"/>
+                  </svg>
+                </div>
+              </button>
+            </a>
+            <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.55); letter-spacing: 0.3px; font-weight: 600;">Tap to Scan</span>
+          </div>
+
+          <!-- Flashlight toggle -->
+          <div class="flex flex-col items-center gap-2">
+            <button class="icon-btn" id="flashBtn" onclick="toggleFlash()">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" id="flashIcon">
+                <path d="M11 2L4 11H10L9 18L16 9H10L11 2Z" stroke="rgba(255,255,255,0.6)" stroke-width="1.6" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <span class="font-body" id="flashLabel" style="font-size: 10px; color: rgba(255,255,255,0.45); letter-spacing: 0.3px;">Flash Off</span>
+          </div>
+
+        </div>
+
+        <!-- Bottom navigation links row -->
+        <div class="flex items-center justify-center gap-6 mt-5 pt-4" style="border-top: 1px solid rgba(255,255,255,0.08);">
+          <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/home-dashboard" class="font-body flex items-center gap-1.5" style="text-decoration: none; color: rgba(255,255,255,0.4); font-size: 10.5px; font-weight: 500; transition: color 0.2s;">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M1.5 5.5L6.5 1.5L11.5 5.5V11.5H8.5V8.5H4.5V11.5H1.5V5.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            </svg>
+            Home
+          </a>
+          <div style="width: 1px; height: 12px; background: rgba(255,255,255,0.15);"></div>
+          <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/disease-detection-result" class="font-body flex items-center gap-1.5" style="text-decoration: none; color: rgba(168,230,61,0.65); font-size: 10.5px; font-weight: 600; transition: color 0.2s;">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M4 6.5L6 8.5L9.5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            View Results
+          </a>
+          <div style="width: 1px; height: 12px; background: rgba(255,255,255,0.15);"></div>
+          <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/profile-settings" class="font-body flex items-center gap-1.5" style="text-decoration: none; color: rgba(255,255,255,0.4); font-size: 10.5px; font-weight: 500; transition: color 0.2s;">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <circle cx="6.5" cy="4" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M1.5 11.5C1.5 9.3 3.8 7.5 6.5 7.5C9.2 7.5 11.5 9.3 11.5 11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            Profile
+          </a>
+        </div>
+
+        <!-- Safe area indicator -->
+        <div class="flex items-center justify-center mt-4">
+          <div style="width: 120px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.12);"></div>
+        </div>
+
+      </div>
+
+      <!-- ===== SCAN HISTORY STRIP (above bottom panel) ===== -->
+      <div style="position: absolute; bottom: 230px; left: 0; right: 0; z-index: 9; padding: 0 20px;">
+        <div class="flex items-center gap-3 hide-scrollbar" style="overflow-x: auto; padding-bottom: 4px;">
+          <!-- Recent scan thumbnails -->
+          <div style="flex-shrink: 0; text-align: center;">
+            <div style="width: 44px; height: 44px; border-radius: 10px; overflow: hidden; border: 1.5px solid rgba(168,230,61,0.5); box-shadow: 0 2px 12px rgba(0,0,0,0.4);">
+              <img src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=88&h=88&fit=crop" alt="Scan 1" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <p class="font-body" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-top: 3px; text-align: center;">2h ago</p>
+          </div>
+          <div style="flex-shrink: 0; text-align: center;">
+            <div style="width: 44px; height: 44px; border-radius: 10px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.15); box-shadow: 0 2px 12px rgba(0,0,0,0.4);">
+              <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=88&h=88&fit=crop" alt="Scan 2" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <p class="font-body" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-top: 3px; text-align: center;">1d ago</p>
+          </div>
+          <div style="flex-shrink: 0; text-align: center;">
+            <div style="width: 44px; height: 44px; border-radius: 10px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.15); box-shadow: 0 2px 12px rgba(0,0,0,0.4);">
+              <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=88&h=88&fit=crop" alt="Scan 3" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <p class="font-body" style="font-size: 8px; color: rgba(255,255,255,0.4); margin-top: 3px; text-align: center;">3d ago</p>
+          </div>
+          <!-- Spacer to push left -->
+          <div style="flex: 1;"></div>
+          <!-- Zoom indicator -->
+          <div style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 5px 12px; backdrop-filter: blur(8px);">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <circle cx="5" cy="5" r="4" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
+              <path d="M8.5 8.5L11 11" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M3 5H7M5 3V7" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            <span class="font-body" style="font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.75);">1×</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // Flash toggle
+    let flashOn = false;
+    function toggleFlash() {
+      flashOn = !flashOn;
+      const btn = document.getElementById('flashBtn');
+      const label = document.getElementById('flashLabel');
+      const icon = document.getElementById('flashIcon');
+      if (flashOn) {
+        btn.classList.add('active');
+        label.textContent = 'Flash On';
+        label.style.color = '#A8E63D';
+        icon.innerHTML = '<path d="M11 2L4 11H10L9 18L16 9H10L11 2Z" fill="#A8E63D" stroke="#A8E63D" stroke-width="1.6" stroke-linejoin="round"/>';
+      } else {
+        btn.classList.remove('active');
+        label.textContent = 'Flash Off';
+        label.style.color = 'rgba(255,255,255,0.45)';
+        icon.innerHTML = '<path d="M11 2L4 11H10L9 18L16 9H10L11 2Z" stroke="rgba(255,255,255,0.6)" stroke-width="1.6" stroke-linejoin="round"/>';
+      }
+    }
+
+    // Mode selector
+    function setMode(el, mode) {
+      document.querySelectorAll('.mode-tab').forEach(function(tab) {
+        tab.style.background = 'rgba(255,255,255,0.08)';
+        tab.style.color = 'rgba(255,255,255,0.55)';
+        tab.style.border = '1px solid rgba(255,255,255,0.12)';
+      });
+      el.style.background = '#A8E63D';
+      el.style.color = '#0F3D22';
+      el.style.border = 'none';
+    }
+
+    // Gallery open (simulated)
+    function openGallery() {
+      const btn = document.getElementById('galleryBtn');
+      btn.style.transform = 'scale(0.92)';
+      setTimeout(function() { btn.style.transform = ''; }, 200);
+    }
+
+    // Capture button feedback
+    const captureBtn = document.querySelector('.capture-btn');
+    if (captureBtn) {
+      captureBtn.addEventListener('mousedown', function() {
+        this.style.transform = 'scale(0.93)';
+      });
+      captureBtn.addEventListener('mouseup', function() {
+        this.style.transform = '';
+      });
+    }
+
+    // Hover effects on nav links
+    document.querySelectorAll('.frosted-panel a').forEach(function(link) {
+      if (!link.querySelector('.capture-btn')) {
+        link.addEventListener('mouseenter', function() {
+          if (this.style.color !== 'rgb(168, 230, 61)') {
+            this.style.color = 'rgba(255,255,255,0.75)';
+          }
+        });
+        link.addEventListener('mouseleave', function() {
+          if (this.getAttribute('href') === '/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/disease-detection-result') {
+            this.style.color = 'rgba(168,230,61,0.65)';
+          } else {
+            this.style.color = 'rgba(255,255,255,0.4)';
+          }
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>

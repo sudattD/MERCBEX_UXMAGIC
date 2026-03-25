@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en" style="height: auto; min-height: 100%;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MERCBEX – Disease Detection Result</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link id="heading-font-link" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link id="body-font-link" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['var(--font-heading-name)', 'sans-serif'],
+            body: ['var(--font-body-name)', 'sans-serif'],
+          },
+          spacing: {
+            base: 'var(--space-base)',
+          },
+          borderRadius: {
+            small: 'var(--radius-small)',
+            large: 'var(--radius-large)',
+          },
+          boxShadow: {
+            custom: 'var(--shadow-custom)',
+            'custom-hover': 'var(--shadow-custom-hover)',
+          },
+          colors: {
+            brand: {
+              dark: '#0F3D22',
+              mid: '#1A5C34',
+              light: '#2A7A48',
+              lime: '#A8E63D',
+              'lime-bright': '#C4F135',
+              'lime-soft': '#D4F76A',
+              'lime-pale': '#E8FBAA',
+            }
+          },
+          keyframes: {
+            progressLine: {
+              '0%': { width: '0%' },
+              '100%': { width: '100%' },
+            },
+            glowPulse: {
+              '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+              '50%': { opacity: '1', transform: 'scale(1.08)' },
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(24px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% center' },
+              '100%': { backgroundPosition: '200% center' },
+            },
+            ringExpand: {
+              '0%': { transform: 'scale(0.85)', opacity: '0.8' },
+              '100%': { transform: 'scale(1.35)', opacity: '0' },
+            }
+          },
+          animation: {
+            progressLine: 'progressLine 3.2s cubic-bezier(0.4,0,0.2,1) forwards',
+            glowPulse: 'glowPulse 2.8s ease-in-out infinite',
+            fadeUp: 'fadeUp 0.9s ease-out forwards',
+            'fadeUp-delay': 'fadeUp 0.9s ease-out 0.4s forwards',
+            'fadeUp-delay2': 'fadeUp 0.9s ease-out 0.7s forwards',
+            shimmer: 'shimmer 2.5s linear infinite',
+            ringExpand: 'ringExpand 2.4s ease-out infinite',
+            'ringExpand-delay': 'ringExpand 2.4s ease-out 1.2s infinite',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --font-heading-name: 'Syne';
+      --font-body-name: 'DM Sans';
+      --font-heading: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --letter-spacing-heading: 0.5px;
+      --letter-spacing-body: 0px;
+
+      --space-base: 1rem;
+
+      --radius-small: 6px;
+      --radius-large: 16px;
+      --border-width: 1.5px;
+
+      --shadow-color: 168 230 61;
+      --shadow-offset-x: 0px;
+      --shadow-offset-y: 0px;
+      --shadow-blur: 48px;
+      --shadow-spread: 0px;
+      --shadow-opacity: 0.35;
+      --shadow-custom: 0px 0px 48px 0px rgba(168, 230, 61, 0.35);
+      --shadow-custom-hover: 0px 0px 72px 0px rgba(168, 230, 61, 0.55);
+    }
+
+    .logo-glow {
+      filter: drop-shadow(0 0 32px rgba(168, 230, 61, 0.7)) drop-shadow(0 0 64px rgba(168, 230, 61, 0.35));
+    }
+
+    .shimmer-text {
+      background: linear-gradient(90deg, #A8E63D 0%, #C4F135 30%, #ffffff 50%, #C4F135 70%, #A8E63D 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+    }
+
+    .progress-track {
+      background: rgba(168, 230, 61, 0.15);
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #A8E63D, #C4F135, #A8E63D);
+      box-shadow: 0 0 12px rgba(168, 230, 61, 0.8), 0 0 24px rgba(168, 230, 61, 0.4);
+      animation: progressLine 3.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .ring-1-anim {
+      animation: ringExpand 2.4s ease-out infinite;
+    }
+
+    .ring-2-anim {
+      animation: ringExpand 2.4s ease-out 1.2s infinite;
+    }
+
+    .tagline-hindi {
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Disease highlight overlay pulse */
+    @keyframes diseaseGlow {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 0.85; }
+    }
+    .disease-overlay {
+      animation: diseaseGlow 2.5s ease-in-out infinite;
+    }
+
+    /* Frosted glass panels */
+    .frosted-dark {
+      background: rgba(10, 28, 15, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    .frosted-card {
+      background: rgba(15, 40, 20, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(168, 230, 61, 0.14);
+    }
+
+    /* Tab active indicator */
+    .tab-active {
+      color: #A8E63D;
+      border-bottom: 2px solid #A8E63D;
+    }
+    .tab-inactive {
+      color: rgba(255,255,255,0.45);
+      border-bottom: 2px solid transparent;
+    }
+
+    /* Severity bar fill */
+    @keyframes barFill {
+      0% { width: 0%; }
+      100% { width: var(--fill-width); }
+    }
+    .severity-bar-fill {
+      animation: barFill 1.2s cubic-bezier(0.4,0,0.2,1) 0.5s forwards;
+      width: 0%;
+    }
+
+    /* Scrollbar hide */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Product card hover */
+    .product-card {
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Confidence chip pulse */
+    @keyframes chipPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+    }
+    .confidence-chip {
+      animation: chipPulse 2.5s ease-in-out infinite;
+    }
+
+    /* Bottom sheet slide up */
+    @keyframes slideUp {
+      0% { transform: translateY(40px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .slide-up {
+      animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+      opacity: 0;
+    }
+
+    /* Fade in up for content */
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-up-1 { animation: fadeInUp 0.5s ease-out 0.1s forwards; opacity: 0; }
+    .fade-in-up-2 { animation: fadeInUp 0.5s ease-out 0.25s forwards; opacity: 0; }
+    .fade-in-up-3 { animation: fadeInUp 0.5s ease-out 0.4s forwards; opacity: 0; }
+
+    /* Disease spot markers */
+    @keyframes spotPulse {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+    .spot-marker {
+      animation: spotPulse 1.8s ease-in-out infinite;
+    }
+    .spot-marker-2 {
+      animation: spotPulse 1.8s ease-in-out 0.6s infinite;
+    }
+    .spot-marker-3 {
+      animation: spotPulse 1.8s ease-in-out 1.2s infinite;
+    }
+  </style>
+</head>
+<body class="font-body" style="height: auto; min-height: 100%; background-color: #0A1A0D;">
+
+  <div style="max-width: 430px; margin: 0 auto; background: #0A1A0D; position: relative;">
+
+    <!-- ===== TOP NAV BAR ===== -->
+    <div class="frosted-dark flex items-center justify-between px-5 pt-11 pb-4" style="position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(168,230,61,0.1);">
+      <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/crop-scan-screen" style="text-decoration: none; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M11 4L6 9L11 14" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="flex flex-col items-center gap-0.5">
+        <h1 class="font-heading" style="font-size: 14px; font-weight: 700; color: #FFFFFF; letter-spacing: 1.5px;">SCAN RESULT</h1>
+        <p class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.65); letter-spacing: 0.5px;">स्कैन परिणाम</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button style="width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 4H14M2 8H10M2 12H12" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== SCANNED LEAF IMAGE WITH DISEASE OVERLAY ===== -->
+    <div style="position: relative; width: 100%; height: 300px; overflow: hidden;" class="fade-in-up-1">
+
+      <!-- Leaf background image -->
+      <img src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=430&h=300&fit=crop&crop=center" alt="Scanned wheat leaf" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;">
+
+      <!-- Dark overlay for contrast -->
+      <div style="position: absolute; inset: 0; z-index: 1; background: rgba(0,0,0,0.25);"></div>
+
+      <!-- Red-amber disease highlight blobs -->
+      <div class="disease-overlay" style="position: absolute; z-index: 2; top: 28%; left: 22%; width: 80px; height: 55px; border-radius: 50%; background: radial-gradient(ellipse, rgba(239,68,68,0.65) 0%, rgba(245,158,11,0.45) 50%, transparent 80%); filter: blur(4px);"></div>
+      <div class="disease-overlay" style="position: absolute; z-index: 2; top: 42%; left: 48%; width: 65px; height: 45px; border-radius: 50%; background: radial-gradient(ellipse, rgba(239,68,68,0.7) 0%, rgba(245,158,11,0.5) 50%, transparent 80%); filter: blur(3px); animation-delay: 0.8s;"></div>
+      <div class="disease-overlay" style="position: absolute; z-index: 2; top: 55%; left: 30%; width: 50px; height: 38px; border-radius: 50%; background: radial-gradient(ellipse, rgba(245,158,11,0.65) 0%, rgba(239,68,68,0.4) 50%, transparent 80%); filter: blur(3px); animation-delay: 1.4s;"></div>
+      <div class="disease-overlay" style="position: absolute; z-index: 2; top: 35%; left: 62%; width: 40px; height: 30px; border-radius: 50%; background: radial-gradient(ellipse, rgba(239,68,68,0.6) 0%, rgba(245,158,11,0.35) 50%, transparent 80%); filter: blur(2px); animation-delay: 0.4s;"></div>
+
+      <!-- Disease spot markers with rings -->
+      <div class="spot-marker" style="position: absolute; z-index: 4; top: 30%; left: 26%; width: 14px; height: 14px; border-radius: 50%; background: rgba(239,68,68,0.9); border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 0 12px rgba(239,68,68,0.8);"></div>
+      <div class="spot-marker-2" style="position: absolute; z-index: 4; top: 46%; left: 54%; width: 12px; height: 12px; border-radius: 50%; background: rgba(245,158,11,0.95); border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 0 10px rgba(245,158,11,0.8);"></div>
+      <div class="spot-marker-3" style="position: absolute; z-index: 4; top: 58%; left: 36%; width: 10px; height: 10px; border-radius: 50%; background: rgba(239,68,68,0.85); border: 1.5px solid rgba(255,255,255,0.7); box-shadow: 0 0 8px rgba(239,68,68,0.7);"></div>
+
+      <!-- Scan grid overlay (subtle) -->
+      <div style="position: absolute; inset: 0; z-index: 2; background-image: linear-gradient(rgba(168,230,61,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(168,230,61,0.04) 1px, transparent 1px); background-size: 30px 30px;"></div>
+
+      <!-- Bottom gradient fade -->
+      <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 100px; z-index: 3; background: linear-gradient(to top, #0A1A0D 0%, transparent 100%);"></div>
+
+      <!-- Top gradient fade -->
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 60px; z-index: 3; background: linear-gradient(to bottom, rgba(10,26,13,0.6) 0%, transparent 100%);"></div>
+
+      <!-- Confidence chip (top-right) -->
+      <div class="confidence-chip" style="position: absolute; top: 16px; right: 16px; z-index: 10; background: rgba(245,158,11,0.18); border: 1.5px solid rgba(245,158,11,0.7); border-radius: 20px; padding: 5px 12px; display: flex; align-items: center; gap-6px; backdrop-filter: blur(12px);">
+        <div class="flex items-center gap-1.5">
+          <div style="width: 7px; height: 7px; border-radius: 50%; background: #F59E0B; box-shadow: 0 0 6px rgba(245,158,11,0.9);"></div>
+          <span class="font-heading" style="font-size: 13px; font-weight: 800; color: #F59E0B; letter-spacing: 0.5px;">98%</span>
+          <span class="font-body" style="font-size: 10px; color: rgba(245,158,11,0.8); font-weight: 500;">Confidence</span>
+        </div>
+      </div>
+
+      <!-- AI badge (top-left) -->
+      <div style="position: absolute; top: 16px; left: 16px; z-index: 10; background: rgba(10,28,15,0.85); border: 1px solid rgba(168,230,61,0.35); border-radius: 20px; padding: 4px 10px; backdrop-filter: blur(12px);">
+        <div class="flex items-center gap-1.5">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <circle cx="5" cy="5" r="4" stroke="#A8E63D" stroke-width="1.2"/>
+            <path d="M3 5L4.5 6.5L7 3.5" stroke="#A8E63D" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="font-body" style="font-size: 10px; color: #A8E63D; font-weight: 600; letter-spacing: 0.5px;">AI DETECTED</span>
+        </div>
+      </div>
+
+      <!-- Disease count badge (bottom-left) -->
+      <div style="position: absolute; bottom: 16px; left: 16px; z-index: 10; background: rgba(239,68,68,0.18); border: 1px solid rgba(239,68,68,0.5); border-radius: 20px; padding: 4px 10px; backdrop-filter: blur(12px);">
+        <span class="font-body" style="font-size: 10px; color: rgba(239,68,68,0.95); font-weight: 600;">3 Infected Zones</span>
+      </div>
+
+      <!-- Scan date (bottom-right) -->
+      <div style="position: absolute; bottom: 16px; right: 16px; z-index: 10;">
+        <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.45);">Today, 10:42 AM</span>
+      </div>
+
+    </div>
+
+    <!-- ===== DISEASE NAME BLOCK ===== -->
+    <div class="px-5 pt-5 pb-4 fade-in-up-2" style="background: #0A1A0D;">
+
+      <!-- Disease name bilingual -->
+      <div class="flex items-start justify-between mb-1">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-1">
+            <div style="width: 4px; height: 24px; background: linear-gradient(to bottom, #EF4444, #F59E0B); border-radius: 2px;"></div>
+            <h2 class="font-heading" style="font-size: 22px; font-weight: 800; color: #FFFFFF; letter-spacing: 0.5px; line-height: 1.1;">Wheat Rust Disease</h2>
+          </div>
+          <p class="font-body" style="font-size: 14px; color: rgba(245,158,11,0.85); font-weight: 500; letter-spacing: 0.3px; margin-left: 12px;">गेहूं का रतुआ रोग</p>
+        </div>
+        <!-- Share button -->
+        <button style="width: 38px; height: 38px; border-radius: 50%; background: rgba(168,230,61,0.1); border: 1px solid rgba(168,230,61,0.25); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin-top: 2px;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="12" cy="3" r="1.8" stroke="#A8E63D" stroke-width="1.3"/>
+            <circle cx="12" cy="13" r="1.8" stroke="#A8E63D" stroke-width="1.3"/>
+            <circle cx="4" cy="8" r="1.8" stroke="#A8E63D" stroke-width="1.3"/>
+            <path d="M10.3 4.1L5.7 6.9M10.3 11.9L5.7 9.1" stroke="#A8E63D" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Pathogen info row -->
+      <div class="flex items-center gap-3 mt-3 ml-3">
+        <div style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 6px; padding: 3px 8px;">
+          <span class="font-body" style="font-size: 10px; color: rgba(239,68,68,0.9); font-weight: 600;">Fungal</span>
+        </div>
+        <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 6px; padding: 3px 8px;">
+          <span class="font-body" style="font-size: 10px; color: rgba(245,158,11,0.9); font-weight: 600;">Puccinia triticina</span>
+        </div>
+        <div style="background: rgba(168,230,61,0.1); border: 1px solid rgba(168,230,61,0.2); border-radius: 6px; padding: 3px 8px;">
+          <span class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.8); font-weight: 600;">Wheat</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== 3-COLUMN SEVERITY ROW ===== -->
+    <div class="px-5 pb-5 fade-in-up-2">
+      <div class="grid grid-cols-3 gap-3">
+
+        <!-- Severity -->
+        <div class="frosted-card rounded-large p-3 text-center">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M9 3V10M9 13V14" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="9" cy="9" r="7.5" stroke="#EF4444" stroke-width="1.3"/>
+            </svg>
+          </div>
+          <p class="font-heading" style="font-size: 15px; font-weight: 800; color: #EF4444; line-height: 1;">HIGH</p>
+          <p class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.45); margin-top: 3px; letter-spacing: 0.3px;">Severity</p>
+          <p class="font-body" style="font-size: 9px; color: rgba(239,68,68,0.7); margin-top: 1px;">गंभीरता</p>
+          <!-- Severity bar -->
+          <div style="height: 3px; background: rgba(239,68,68,0.15); border-radius: 2px; margin-top: 8px; overflow: hidden;">
+            <div class="severity-bar-fill" style="--fill-width: 82%; height: 100%; background: linear-gradient(90deg, #EF4444, #F87171); border-radius: 2px;"></div>
+          </div>
+        </div>
+
+        <!-- Spread Risk -->
+        <div class="frosted-card rounded-large p-3 text-center">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M3 9C3 9 5 5 9 5C13 5 15 9 15 9C15 9 13 13 9 13C5 13 3 9 3 9Z" stroke="#F59E0B" stroke-width="1.3"/>
+              <circle cx="9" cy="9" r="2.5" stroke="#F59E0B" stroke-width="1.3"/>
+            </svg>
+          </div>
+          <p class="font-heading" style="font-size: 15px; font-weight: 800; color: #F59E0B; line-height: 1;">RAPID</p>
+          <p class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.45); margin-top: 3px; letter-spacing: 0.3px;">Spread Risk</p>
+          <p class="font-body" style="font-size: 9px; color: rgba(245,158,11,0.7); margin-top: 1px;">फैलाव जोखिम</p>
+          <!-- Spread bar -->
+          <div style="height: 3px; background: rgba(245,158,11,0.15); border-radius: 2px; margin-top: 8px; overflow: hidden;">
+            <div class="severity-bar-fill" style="--fill-width: 72%; height: 100%; background: linear-gradient(90deg, #F59E0B, #FCD34D); border-radius: 2px; animation-delay: 0.7s;"></div>
+          </div>
+        </div>
+
+        <!-- Crop Loss -->
+        <div class="frosted-card rounded-large p-3 text-center">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(168,230,61,0.12); border: 1px solid rgba(168,230,61,0.25); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M3 14L7 10L10 13L15 7" stroke="#A8E63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 7H15V10" stroke="#A8E63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="font-heading" style="font-size: 15px; font-weight: 800; color: #A8E63D; line-height: 1;">40–60%</p>
+          <p class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.45); margin-top: 3px; letter-spacing: 0.3px;">Crop Loss</p>
+          <p class="font-body" style="font-size: 9px; color: rgba(168,230,61,0.65); margin-top: 1px;">फसल हानि</p>
+          <!-- Loss bar -->
+          <div style="height: 3px; background: rgba(168,230,61,0.12); border-radius: 2px; margin-top: 8px; overflow: hidden;">
+            <div class="severity-bar-fill" style="--fill-width: 50%; height: 100%; background: linear-gradient(90deg, #A8E63D, #C4F135); border-radius: 2px; animation-delay: 0.9s;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== TABBED CONTENT ===== -->
+    <div class="px-5 fade-in-up-3">
+
+      <!-- Tab headers -->
+      <div class="flex items-center gap-0 mb-4" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <button id="tab-about" onclick="switchTab('about')" class="tab-active font-body pb-3 pr-6" style="font-size: 13px; font-weight: 600; background: none; border: none; cursor: pointer; letter-spacing: 0.3px; transition: all 0.2s;">
+          About Disease
+        </button>
+        <button id="tab-treatment" onclick="switchTab('treatment')" class="tab-inactive font-body pb-3 pr-6" style="font-size: 13px; font-weight: 600; background: none; border: none; cursor: pointer; letter-spacing: 0.3px; transition: all 0.2s;">
+          Treatment
+        </button>
+        <button id="tab-prevention" onclick="switchTab('prevention')" class="tab-inactive font-body pb-3" style="font-size: 13px; font-weight: 600; background: none; border: none; cursor: pointer; letter-spacing: 0.3px; transition: all 0.2s;">
+          Prevention
+        </button>
+      </div>
+
+      <!-- About Disease Tab Content -->
+      <div id="content-about">
+
+        <!-- Description -->
+        <div class="frosted-card rounded-large p-4 mb-3">
+          <h3 class="font-heading" style="font-size: 12px; font-weight: 700; color: rgba(168,230,61,0.8); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">About This Disease</h3>
+          <p class="font-body" style="font-size: 12.5px; color: rgba(255,255,255,0.72); line-height: 1.65;">
+            Wheat Leaf Rust (Brown Rust) is caused by the fungus <em style="color: rgba(245,158,11,0.85);">Puccinia triticina</em>. It appears as small, round to oval, orange-brown pustules on the upper leaf surface. It thrives in warm, humid conditions and spreads rapidly via airborne spores.
+          </p>
+          <div style="height: 1px; background: rgba(168,230,61,0.1); margin: 10px 0;"></div>
+          <p class="font-body" style="font-size: 12px; color: rgba(168,230,61,0.75); line-height: 1.6;">
+            गेहूं का पत्ती रतुआ एक कवक रोग है जो पत्तियों पर नारंगी-भूरे रंग के धब्बे बनाता है। यह गर्म और आर्द्र मौसम में तेजी से फैलता है।
+          </p>
+        </div>
+
+        <!-- Symptoms -->
+        <div class="frosted-card rounded-large p-4 mb-3">
+          <h3 class="font-heading" style="font-size: 12px; font-weight: 700; color: rgba(168,230,61,0.8); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;">Key Symptoms · मुख्य लक्षण</h3>
+          <div class="flex flex-col gap-2.5">
+            <div class="flex items-start gap-3">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #EF4444; margin-top: 5px; flex-shrink: 0; box-shadow: 0 0 6px rgba(239,68,68,0.6);"></div>
+              <p class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5;">Orange-brown pustules on upper leaf surface (पत्ती पर नारंगी-भूरे धब्बे)</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #F59E0B; margin-top: 5px; flex-shrink: 0; box-shadow: 0 0 6px rgba(245,158,11,0.6);"></div>
+              <p class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5;">Yellowing of leaves around infected areas (संक्रमित क्षेत्र के आसपास पीलापन)</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #A8E63D; margin-top: 5px; flex-shrink: 0; box-shadow: 0 0 6px rgba(168,230,61,0.5);"></div>
+              <p class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5;">Premature leaf senescence and reduced grain filling (समय से पहले पत्ती सूखना)</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #EF4444; margin-top: 5px; flex-shrink: 0; box-shadow: 0 0 6px rgba(239,68,68,0.5);"></div>
+              <p class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5;">Powdery orange spore masses visible on leaf surface</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Favorable Conditions -->
+        <div class="frosted-card rounded-large p-4 mb-4">
+          <h3 class="font-heading" style="font-size: 12px; font-weight: 700; color: rgba(168,230,61,0.8); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;">Favorable Conditions</h3>
+          <div class="grid grid-cols-3 gap-2">
+            <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 8px; text-align: center;">
+              <p class="font-heading" style="font-size: 16px; font-weight: 800; color: #F59E0B;">15–25°C</p>
+              <p class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.45); margin-top: 2px;">Temperature</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 8px; text-align: center;">
+              <p class="font-heading" style="font-size: 16px; font-weight: 800; color: #60A5FA;">80%+</p>
+              <p class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.45); margin-top: 2px;">Humidity</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px 8px; text-align: center;">
+              <p class="font-heading" style="font-size: 16px; font-weight: 800; color: #A8E63D;">Feb–Apr</p>
+              <p class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.45); margin-top: 2px;">Peak Season</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Treatment Tab Content (hidden by default) -->
+      <div id="content-treatment" style="display: none;">
+
+        <div class="frosted-card rounded-large p-4 mb-3">
+          <h3 class="font-heading" style="font-size: 12px; font-weight: 700; color: rgba(168,230,61,0.8); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;">Immediate Action · तत्काल उपाय</h3>
+          <div class="flex flex-col gap-3">
+            <div class="flex items-start gap-3">
+              <div style="width: 22px; height: 22px; border-radius: 6px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span class="font-heading" style="font-size: 11px; font-weight: 800; color: #EF4444;">1</span>
+              </div>
+              <p class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.72); line-height: 1.5;">Apply fungicide spray immediately. Propiconazole 25% EC @ 0.1% concentration. (तुरंत फफूंदनाशक का छिड़काव करें)</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <div style="width: 22px; height: 22px; border-radius: 6px; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span class="font-heading" style="font-size: 11px; font-weight: 800; color: #F59E0B;">2</span>
+              </div>
+              <p class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.72); line-height: 1.5;">Remove and destroy heavily infected leaves to prevent spore spread. (संक्रमित पत्तियां हटाएं)</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <div style="width: 22px; height: 22px; border-radius: 6px; background: rgba(168,230,61,0.12); border: 1px solid rgba(168,230,61,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span class="font-heading" style="font-size: 11px; font-weight: 800; color: #A8E63D;">3</span>
+              </div>
+              <p class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.72); line-height: 1.5;">Repeat spray after 10–14 days if infection persists. Monitor daily. (10-14 दिन बाद दोबारा छिड़काव)</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="frosted-card rounded-large p-4 mb-4">
+          <h3 class="font-heading" style="font-size: 12px; font-weight: 700; color: rgba(168,230,61,0.8); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;">Recommended Dosage</h3>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between py-2" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+              <span class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.6);">Propiconazole 25% EC</span>
+              <span class="font-body" style="font-size: 12px; color: #A8E63D; font-weight: 600;">1 ml / L water</span>
+            </div>
+            <div class="flex items-center justify-between py-2" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+              <span class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.6);">Tebuconazole 25.9% EC</span>
+              <span class="font-body" style="font-size: 12px; color: #A8E63D; font-weight: 600;">0.75 ml / L water</span>
+            </div>
+            <div class="flex items-center justify-between py-2">
+              <span class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.6);">Spray Volume</span>
+              <span class="font-body" style="font-size: 12px; color: #A8E63D; font-weight: 600;">500 L / hectare</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Prevention Tab Content (hidden by default) -->
+      <div id="content-prevention" style="display: none;">
+        <div class="frosted-card rounded-large p-4 mb-3">
+          <h3 class="font-heading" style="font-size: 12px; font-weight: 700; color: rgba(168,230,61,0.8); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;">Prevention Tips · रोकथाम के उपाय</h3>
+          <div class="flex flex-col gap-2.5">
+            <div class="flex items-start gap-3">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #A8E63D; margin-top: 5px; flex-shrink: 0;"></div>
+              <p class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5;">Use rust-resistant wheat varieties (HD-2967, PBW-343) · रोग-प्रतिरोधी किस्में उगाएं</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #A8E63D; margin-top: 5px; flex-shrink: 0;"></div>
+              <p class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5;">Avoid excessive nitrogen fertilization · अत्यधिक नाइट्रोजन उर्वरक से बचें</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #A8E63D; margin-top: 5px; flex-shrink: 0;"></div>
+              <p class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5;">Seed treatment with fungicide before sowing · बुवाई से पहले बीज उपचार करें</p>
+            </div>
+            <div class="flex items-start gap-3">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #A8E63D; margin-top: 5px; flex-shrink: 0;"></div>
+              <p class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5;">Regular field monitoring from tillering stage · कल्ले निकलने से नियमित निगरानी</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== RECOMMENDED PRODUCTS SECTION ===== -->
+    <div class="px-5 pt-2 pb-2 slide-up">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h3 class="font-heading" style="font-size: 14px; font-weight: 800; color: #FFFFFF; letter-spacing: 0.3px;">Recommended Products</h3>
+          <p class="font-body" style="font-size: 11px; color: rgba(168,230,61,0.65); margin-top: 1px;">अनुशंसित उत्पाद</p>
+        </div>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/product-detail-page" style="text-decoration: none; font-size: 11px; color: rgba(168,230,61,0.7); font-weight: 600;" class="font-body">View All →</a>
+      </div>
+
+      <!-- Product Cards -->
+      <div class="flex flex-col gap-3 pb-6">
+
+        <!-- Product Card 1 -->
+        <div class="product-card frosted-card rounded-large p-4">
+          <div class="flex items-start gap-3">
+            <!-- Product image -->
+            <div style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; flex-shrink: 0; border: 1px solid rgba(168,230,61,0.2);">
+              <img src="https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=144&h=144&fit=crop" alt="Propiconazole" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <!-- Product info -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex-1">
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.35); border-radius: 4px; padding: 1px 6px; font-size: 9px; color: rgba(239,68,68,0.9); font-weight: 600;" class="font-body">BEST MATCH</span>
+                  </div>
+                  <h4 class="font-heading" style="font-size: 13px; font-weight: 700; color: #FFFFFF; line-height: 1.2;">Tilt 250 EC</h4>
+                  <p class="font-body" style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 1px;">Propiconazole 25% EC · Syngenta</p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                  <p class="font-heading" style="font-size: 16px; font-weight: 800; color: #A8E63D; line-height: 1;">₹485</p>
+                  <p class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.35); text-decoration: line-through;">₹560</p>
+                </div>
+              </div>
+              <!-- Rating + pack size -->
+              <div class="flex items-center gap-3 mt-2">
+                <div class="flex items-center gap-1">
+                  <svg width="11" height="11" viewBox="0 0 11 11" fill="#F59E0B">
+                    <path d="M5.5 1L6.8 4.1H10L7.4 6.1L8.4 9.2L5.5 7.3L2.6 9.2L3.6 6.1L1 4.1H4.2L5.5 1Z"/>
+                  </svg>
+                  <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.6);">4.7 (312)</span>
+                </div>
+                <span style="width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.2);"></span>
+                <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.5);">250 ml pack</span>
+                <span style="width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.2);"></span>
+                <span class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.7);">In Stock</span>
+              </div>
+              <!-- CTA row -->
+              <div class="flex items-center gap-2 mt-3">
+                <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/cart-checkout" style="text-decoration: none; flex: 1; background: linear-gradient(135deg, #A8E63D 0%, #C4F135 100%); border-radius: 8px; padding: 8px 0; text-align: center; display: block;">
+                  <span class="font-heading" style="font-size: 12px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Buy Now · खरीदें</span>
+                </a>
+                <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/product-detail-page" style="text-decoration: none; width: 36px; height: 36px; border-radius: 8px; background: rgba(168,230,61,0.1); border: 1px solid rgba(168,230,61,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M5 3L9 7L5 11" stroke="#A8E63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Card 2 -->
+        <div class="product-card frosted-card rounded-large p-4">
+          <div class="flex items-start gap-3">
+            <!-- Product image -->
+            <div style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; flex-shrink: 0; border: 1px solid rgba(168,230,61,0.15);">
+              <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=144&h=144&fit=crop" alt="Tebuconazole" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <!-- Product info -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex-1">
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span style="background: rgba(168,230,61,0.1); border: 1px solid rgba(168,230,61,0.3); border-radius: 4px; padding: 1px 6px; font-size: 9px; color: rgba(168,230,61,0.85); font-weight: 600;" class="font-body">ORGANIC</span>
+                  </div>
+                  <h4 class="font-heading" style="font-size: 13px; font-weight: 700; color: #FFFFFF; line-height: 1.2;">Raxil 2% DS</h4>
+                  <p class="font-body" style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 1px;">Tebuconazole 2% DS · Bayer</p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                  <p class="font-heading" style="font-size: 16px; font-weight: 800; color: #A8E63D; line-height: 1;">₹320</p>
+                  <p class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.35); text-decoration: line-through;">₹380</p>
+                </div>
+              </div>
+              <!-- Rating + pack size -->
+              <div class="flex items-center gap-3 mt-2">
+                <div class="flex items-center gap-1">
+                  <svg width="11" height="11" viewBox="0 0 11 11" fill="#F59E0B">
+                    <path d="M5.5 1L6.8 4.1H10L7.4 6.1L8.4 9.2L5.5 7.3L2.6 9.2L3.6 6.1L1 4.1H4.2L5.5 1Z"/>
+                  </svg>
+                  <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.6);">4.5 (198)</span>
+                </div>
+                <span style="width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.2);"></span>
+                <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.5);">500 gm pack</span>
+                <span style="width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.2);"></span>
+                <span class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.7);">In Stock</span>
+              </div>
+              <!-- CTA row -->
+              <div class="flex items-center gap-2 mt-3">
+                <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/cart-checkout" style="text-decoration: none; flex: 1; background: rgba(168,230,61,0.12); border: 1.5px solid rgba(168,230,61,0.4); border-radius: 8px; padding: 8px 0; text-align: center; display: block;">
+                  <span class="font-heading" style="font-size: 12px; font-weight: 700; color: #A8E63D; letter-spacing: 0.3px;">Add to Cart · कार्ट</span>
+                </a>
+                <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/product-detail-page" style="text-decoration: none; width: 36px; height: 36px; border-radius: 8px; background: rgba(168,230,61,0.1); border: 1px solid rgba(168,230,61,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M5 3L9 7L5 11" stroke="#A8E63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Card 3 -->
+        <div class="product-card frosted-card rounded-large p-4">
+          <div class="flex items-start gap-3">
+            <!-- Product image -->
+            <div style="width: 72px; height: 72px; border-radius: 12px; overflow: hidden; flex-shrink: 0; border: 1px solid rgba(168,230,61,0.15);">
+              <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=144&h=144&fit=crop" alt="Mancozeb" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <!-- Product info -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex-1">
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span style="background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.3); border-radius: 4px; padding: 1px 6px; font-size: 9px; color: rgba(96,165,250,0.9); font-weight: 600;" class="font-body">BUDGET</span>
+                  </div>
+                  <h4 class="font-heading" style="font-size: 13px; font-weight: 700; color: #FFFFFF; line-height: 1.2;">Dithane M-45</h4>
+                  <p class="font-body" style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 1px;">Mancozeb 75% WP · Dow AgroSciences</p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                  <p class="font-heading" style="font-size: 16px; font-weight: 800; color: #A8E63D; line-height: 1;">₹195</p>
+                  <p class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.35); text-decoration: line-through;">₹240</p>
+                </div>
+              </div>
+              <!-- Rating + pack size -->
+              <div class="flex items-center gap-3 mt-2">
+                <div class="flex items-center gap-1">
+                  <svg width="11" height="11" viewBox="0 0 11 11" fill="#F59E0B">
+                    <path d="M5.5 1L6.8 4.1H10L7.4 6.1L8.4 9.2L5.5 7.3L2.6 9.2L3.6 6.1L1 4.1H4.2L5.5 1Z"/>
+                  </svg>
+                  <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.6);">4.3 (445)</span>
+                </div>
+                <span style="width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.2);"></span>
+                <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.5);">1 kg pack</span>
+                <span style="width: 3px; height: 3px; border-radius: 50%; background: rgba(255,255,255,0.2);"></span>
+                <span class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.7);">In Stock</span>
+              </div>
+              <!-- CTA row -->
+              <div class="flex items-center gap-2 mt-3">
+                <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/cart-checkout" style="text-decoration: none; flex: 1; background: rgba(168,230,61,0.12); border: 1.5px solid rgba(168,230,61,0.4); border-radius: 8px; padding: 8px 0; text-align: center; display: block;">
+                  <span class="font-heading" style="font-size: 12px; font-weight: 700; color: #A8E63D; letter-spacing: 0.3px;">Add to Cart · कार्ट</span>
+                </a>
+                <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/product-detail-page" style="text-decoration: none; width: 36px; height: 36px; border-radius: 8px; background: rgba(168,230,61,0.1); border: 1px solid rgba(168,230,61,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M5 3L9 7L5 11" stroke="#A8E63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== STICKY BOTTOM NAVIGATION ===== -->
+    <div class="frosted-dark" style="position: sticky; bottom: 0; left: 0; right: 0; z-index: 50; border-top: 1px solid rgba(168,230,61,0.12); padding: 12px 20px 24px;">
+      <div class="flex items-center justify-around">
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/home-dashboard" class="flex flex-col items-center gap-1" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 6.5L8 2L14 6.5V14H10V10H6V14H2V6.5Z" stroke="rgba(255,255,255,0.45)" stroke-width="1.4" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.3px;">Home</span>
+        </a>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/crop-scan-screen" class="flex flex-col items-center gap-1" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="2" width="12" height="12" rx="2.5" stroke="rgba(255,255,255,0.45)" stroke-width="1.4"/>
+              <circle cx="8" cy="8" r="2.5" stroke="rgba(255,255,255,0.45)" stroke-width="1.4"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.3px;">Scan</span>
+        </a>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/disease-detection-result" class="flex flex-col items-center gap-1" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(168,230,61,0.15); border: 1px solid rgba(168,230,61,0.35); display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="6" stroke="#A8E63D" stroke-width="1.4"/>
+              <path d="M5 8L7 10L11 6" stroke="#A8E63D" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: #A8E63D; font-weight: 600; letter-spacing: 0.3px;">Results</span>
+        </a>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/cart-checkout" class="flex flex-col items-center gap-1" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; position: relative;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 2H3.5L5.5 10H12L14 5H4.5" stroke="rgba(255,255,255,0.45)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="6.5" cy="12.5" r="1" fill="rgba(255,255,255,0.45)"/>
+              <circle cx="11.5" cy="12.5" r="1" fill="rgba(255,255,255,0.45)"/>
+            </svg>
+            <div style="position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; background: #EF4444; border: 1.5px solid #0A1A0D; display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 5px; color: white; font-weight: 700;">3</span>
+            </div>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.3px;">Cart</span>
+        </a>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/profile-settings" class="flex flex-col items-center gap-1" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="5" r="2.5" stroke="rgba(255,255,255,0.45)" stroke-width="1.4"/>
+              <path d="M3 14C3 11.8 5.2 10 8 10C10.8 10 13 11.8 13 14" stroke="rgba(255,255,255,0.45)" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.3px;">Profile</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Tab switching
+    function switchTab(tab) {
+      // Hide all content
+      document.getElementById('content-about').style.display = 'none';
+      document.getElementById('content-treatment').style.display = 'none';
+      document.getElementById('content-prevention').style.display = 'none';
+
+      // Reset all tabs
+      ['tab-about', 'tab-treatment', 'tab-prevention'].forEach(function(id) {
+        var el = document.getElementById(id);
+        el.className = 'tab-inactive font-body pb-3 pr-6';
+        if (id === 'tab-prevention') el.className = 'tab-inactive font-body pb-3';
+      });
+
+      // Show selected content and activate tab
+      document.getElementById('content-' + tab).style.display = 'block';
+      var activeTab = document.getElementById('tab-' + tab);
+      activeTab.className = activeTab.className.replace('tab-inactive', 'tab-active');
+    }
+
+    // Animate severity bars on load
+    document.addEventListener('DOMContentLoaded', function() {
+      var bars = document.querySelectorAll('.severity-bar-fill');
+      bars.forEach(function(bar) {
+        var fillWidth = bar.style.getPropertyValue('--fill-width');
+        setTimeout(function() {
+          bar.style.width = fillWidth;
+        }, 600);
+      });
+    });
+
+    // Product card hover effects
+    document.querySelectorAll('.product-card').forEach(function(card) {
+      card.addEventListener('mouseenter', function() {
+        this.style.borderColor = 'rgba(168,230,61,0.3)';
+      });
+      card.addEventListener('mouseleave', function() {
+        this.style.borderColor = 'rgba(168,230,61,0.14)';
+      });
+    });
+  </script>
+
+</body>
+</html>

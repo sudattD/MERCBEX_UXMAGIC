@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en" style="height: auto; min-height: 100%;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MERCBEX – Crop Selection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link id="heading-font-link" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link id="body-font-link" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['var(--font-heading-name)', 'sans-serif'],
+            body: ['var(--font-body-name)', 'sans-serif'],
+          },
+          spacing: {
+            base: 'var(--space-base)',
+          },
+          borderRadius: {
+            small: 'var(--radius-small)',
+            large: 'var(--radius-large)',
+          },
+          boxShadow: {
+            custom: 'var(--shadow-custom)',
+            'custom-hover': 'var(--shadow-custom-hover)',
+          },
+          colors: {
+            brand: {
+              dark: '#0F3D22',
+              mid: '#1A5C34',
+              light: '#2A7A48',
+              lime: '#A8E63D',
+              'lime-bright': '#C4F135',
+              'lime-soft': '#D4F76A',
+              'lime-pale': '#E8FBAA',
+            }
+          },
+          keyframes: {
+            progressLine: {
+              '0%': { width: '0%' },
+              '100%': { width: '100%' },
+            },
+            glowPulse: {
+              '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+              '50%': { opacity: '1', transform: 'scale(1.08)' },
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(24px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% center' },
+              '100%': { backgroundPosition: '200% center' },
+            },
+            ringExpand: {
+              '0%': { transform: 'scale(0.85)', opacity: '0.8' },
+              '100%': { transform: 'scale(1.35)', opacity: '0' },
+            }
+          },
+          animation: {
+            progressLine: 'progressLine 3.2s cubic-bezier(0.4,0,0.2,1) forwards',
+            glowPulse: 'glowPulse 2.8s ease-in-out infinite',
+            fadeUp: 'fadeUp 0.9s ease-out forwards',
+            'fadeUp-delay': 'fadeUp 0.9s ease-out 0.4s forwards',
+            'fadeUp-delay2': 'fadeUp 0.9s ease-out 0.7s forwards',
+            shimmer: 'shimmer 2.5s linear infinite',
+            ringExpand: 'ringExpand 2.4s ease-out infinite',
+            'ringExpand-delay': 'ringExpand 2.4s ease-out 1.2s infinite',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --font-heading-name: 'Syne';
+      --font-body-name: 'DM Sans';
+      --font-heading: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --letter-spacing-heading: 0.5px;
+      --letter-spacing-body: 0px;
+
+      --space-base: 1rem;
+
+      --radius-small: 6px;
+      --radius-large: 16px;
+      --border-width: 1.5px;
+
+      --shadow-color: 168 230 61;
+      --shadow-offset-x: 0px;
+      --shadow-offset-y: 0px;
+      --shadow-blur: 48px;
+      --shadow-spread: 0px;
+      --shadow-opacity: 0.35;
+      --shadow-custom: 0px 0px 48px 0px rgba(168, 230, 61, 0.35);
+      --shadow-custom-hover: 0px 0px 72px 0px rgba(168, 230, 61, 0.55);
+    }
+
+    .logo-glow {
+      filter: drop-shadow(0 0 32px rgba(168, 230, 61, 0.7)) drop-shadow(0 0 64px rgba(168, 230, 61, 0.35));
+    }
+
+    .shimmer-text {
+      background: linear-gradient(90deg, #A8E63D 0%, #C4F135 30%, #ffffff 50%, #C4F135 70%, #A8E63D 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+    }
+
+    .progress-track {
+      background: rgba(168, 230, 61, 0.15);
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #A8E63D, #C4F135, #A8E63D);
+      box-shadow: 0 0 12px rgba(168, 230, 61, 0.8), 0 0 24px rgba(168, 230, 61, 0.4);
+      animation: progressLine 3.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .ring-1-anim {
+      animation: ringExpand 2.4s ease-out infinite;
+    }
+
+    .ring-2-anim {
+      animation: ringExpand 2.4s ease-out 1.2s infinite;
+    }
+
+    .tagline-hindi {
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Crop card styles */
+    .crop-card {
+      background: #FFFFFF;
+      border: 2px solid #E8EDE9;
+      border-radius: var(--radius-large);
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .crop-card:hover {
+      border-color: rgba(168, 230, 61, 0.5);
+      box-shadow: 0 4px 20px rgba(168, 230, 61, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .crop-card.selected {
+      border-color: #A8E63D;
+      background: linear-gradient(145deg, #FAFFF4 0%, #F0FBDF 100%);
+      box-shadow: 0 4px 24px rgba(168, 230, 61, 0.22), 0 0 0 1px rgba(168, 230, 61, 0.25);
+    }
+
+    .crop-card.selected .crop-checkmark {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .crop-card .crop-checkmark {
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .crop-card.selected .crop-illustration-bg {
+      background: rgba(168, 230, 61, 0.12);
+    }
+
+    .crop-illustration-bg {
+      background: rgba(15, 61, 34, 0.04);
+      border-radius: 12px;
+      transition: background 0.22s ease;
+    }
+
+    .crop-card.selected .crop-active-bar {
+      opacity: 1;
+    }
+
+    .crop-active-bar {
+      opacity: 0;
+      transition: opacity 0.22s ease;
+    }
+
+    /* Continue button */
+    .continue-btn {
+      background: linear-gradient(135deg, #A8E63D 0%, #C4F135 100%);
+      border-radius: 999px;
+      transition: all 0.22s ease;
+      box-shadow: 0 4px 20px rgba(168, 230, 61, 0.4);
+    }
+
+    .continue-btn:hover {
+      box-shadow: 0 6px 32px rgba(168, 230, 61, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .continue-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 12px rgba(168, 230, 61, 0.3);
+    }
+
+    .continue-btn.disabled {
+      background: linear-gradient(135deg, #C8D4B8 0%, #D4DEC4 100%);
+      box-shadow: none;
+      pointer-events: none;
+    }
+
+    /* Step indicator dots */
+    .step-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #D4DEC4;
+      transition: all 0.22s ease;
+    }
+
+    .step-dot.active {
+      width: 20px;
+      border-radius: 3px;
+      background: #A8E63D;
+    }
+
+    .step-dot.done {
+      background: rgba(168, 230, 61, 0.5);
+    }
+
+    /* Sticky bottom bar */
+    .sticky-bottom-bar {
+      position: sticky;
+      bottom: 0;
+      background: #FFFFFF;
+      border-top: 1px solid rgba(15, 61, 34, 0.08);
+      box-shadow: 0 -8px 32px rgba(15, 61, 34, 0.08);
+      z-index: 50;
+    }
+
+    /* Card fade-in animations */
+    @keyframes cardFadeIn {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-anim-1 { animation: cardFadeIn 0.45s ease-out 0.08s both; }
+    .card-anim-2 { animation: cardFadeIn 0.45s ease-out 0.14s both; }
+    .card-anim-3 { animation: cardFadeIn 0.45s ease-out 0.20s both; }
+    .card-anim-4 { animation: cardFadeIn 0.45s ease-out 0.26s both; }
+    .card-anim-5 { animation: cardFadeIn 0.45s ease-out 0.32s both; }
+    .card-anim-6 { animation: cardFadeIn 0.45s ease-out 0.38s both; }
+    .card-anim-7 { animation: cardFadeIn 0.45s ease-out 0.44s both; }
+    .card-anim-8 { animation: cardFadeIn 0.45s ease-out 0.50s both; }
+    .card-anim-9 { animation: cardFadeIn 0.45s ease-out 0.56s both; }
+    .card-anim-10 { animation: cardFadeIn 0.45s ease-out 0.62s both; }
+
+    @keyframes headerFadeIn {
+      0% { opacity: 0; transform: translateY(-12px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .header-anim { animation: headerFadeIn 0.5s ease-out 0s both; }
+    .heading-anim { animation: cardFadeIn 0.6s ease-out 0.05s both; }
+
+    /* Count badge pulse */
+    @keyframes countPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+    .count-pop {
+      animation: countPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Crop emoji illustration container */
+    .crop-emoji-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      font-size: 30px;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="font-body" style="height: auto; min-height: 100%; background-color: #F5F7F2;">
+
+  <div class="flex flex-col" style="background-color: #F5F7F2;">
+
+    <!-- Top Navigation Bar -->
+    <nav class="w-full flex items-center justify-between px-5 pt-10 pb-4 header-anim" style="background: transparent; position: sticky; top: 0; z-index: 40; background-color: #F5F7F2;">
+      <!-- Back arrow -->
+      <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/language-selection" class="flex items-center justify-center" style="width: 38px; height: 38px; border-radius: 10px; background: rgba(15,61,34,0.07); border: 1px solid rgba(15,61,34,0.1); text-decoration: none; transition: background 0.2s;">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M11 14L6 9L11 4" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+
+      <!-- MERCBEX Logo + wordmark -->
+      <div class="flex items-center gap-2">
+        <div style="width: 30px; height: 30px;">
+          <svg width="30" height="33" viewBox="0 0 110 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M55 4L8 22V58C8 84.5 28.5 108.5 55 116C81.5 108.5 102 84.5 102 58V22L55 4Z" fill="#1A5C34" stroke="#A8E63D" stroke-width="2.5"/>
+            <path d="M55 12L16 27V58C16 80.5 33 101.5 55 108C77 101.5 94 80.5 94 58V27L55 12Z" fill="#0F3D22" opacity="0.6"/>
+            <path d="M55 30C55 30 38 42 38 60C38 72.5 45.5 80 55 82C64.5 80 72 72.5 72 60C72 42 55 30 55 30Z" fill="#A8E63D" opacity="0.95"/>
+            <line x1="55" y1="32" x2="55" y2="80" stroke="#0F3D22" stroke-width="2" stroke-linecap="round"/>
+            <path d="M55 50 Q47 54 42 62" stroke="#0F3D22" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <path d="M55 50 Q63 54 68 62" stroke="#0F3D22" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <span class="font-heading" style="font-size: 18px; font-weight: 800; color: #0F3D22; letter-spacing: 3px;">MERCBEX</span>
+      </div>
+
+      <!-- Step indicator -->
+      <div class="flex items-center gap-1.5">
+        <div class="step-dot done"></div>
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+      </div>
+    </nav>
+
+    <!-- Main Scrollable Content -->
+    <div class="flex flex-col px-5 pb-4">
+
+      <!-- Heading block -->
+      <div class="mt-2 mb-5 heading-anim">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="font-body" style="font-size: 11px; font-weight: 600; color: #A8E63D; letter-spacing: 2px; text-transform: uppercase;">Step 2 of 3</span>
+          <div style="flex: 1; height: 1px; background: linear-gradient(90deg, rgba(168,230,61,0.4), transparent);"></div>
+        </div>
+        <h1 class="font-heading" style="font-size: 26px; font-weight: 800; color: #0F3D22; line-height: 1.2; letter-spacing: 0.3px;">
+          Select Your<br>Crops
+        </h1>
+        <p class="font-body mt-1" style="font-size: 13px; color: rgba(15,61,34,0.55); font-weight: 400; letter-spacing: 0.2px;">
+          अपनी फसलें चुनें · మీ పంటలను ఎంచుకోండి
+        </p>
+        <div class="mt-3" style="width: 48px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, #A8E63D, #C4F135);"></div>
+      </div>
+
+      <!-- Hint chip -->
+      <div class="flex items-center gap-2 mb-4" style="background: rgba(168,230,61,0.08); border: 1px solid rgba(168,230,61,0.2); border-radius: var(--radius-small); padding: 8px 12px;">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink: 0;">
+          <path d="M7 1L8.5 5H13L9.5 7.5L11 11.5L7 9L3 11.5L4.5 7.5L1 5H5.5L7 1Z" fill="#A8E63D" opacity="0.8"/>
+        </svg>
+        <p class="font-body" style="font-size: 11.5px; color: rgba(15,61,34,0.6); line-height: 1.4;">
+          Select <span style="color: #0F3D22; font-weight: 600;">one or more crops</span> you grow on your farm
+        </p>
+      </div>
+
+      <!-- Crop Cards Grid -->
+      <div class="grid grid-cols-2 gap-3" id="cropGrid">
+
+        <!-- Wheat -->
+        <div class="crop-card card-anim-1" data-crop="wheat" onclick="toggleCrop(this)">
+          <div class="flex flex-col items-center p-4" style="gap: 10px; position: relative; z-index: 1;">
+            <!-- Checkmark badge -->
+            <div class="crop-checkmark" style="position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: #A8E63D; display: flex; align-items: center; justify-content: center; z-index: 2;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6L5 9L10 3" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <!-- Illustration -->
+            <div class="crop-illustration-bg crop-emoji-wrap">
+              <span>🌾</span>
+            </div>
+            <!-- Labels -->
+            <div class="text-center" style="width: 100%;">
+              <div class="font-heading" style="font-size: 14px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Wheat</div>
+              <div class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.55); font-weight: 400; margin-top: 1px;">गेहूँ</div>
+            </div>
+            <!-- Active bottom bar -->
+            <div class="crop-active-bar" style="width: 100%; height: 2px; border-radius: 1px; background: linear-gradient(90deg, #A8E63D, #C4F135);"></div>
+          </div>
+        </div>
+
+        <!-- Rice -->
+        <div class="crop-card card-anim-2" data-crop="rice" onclick="toggleCrop(this)">
+          <div class="flex flex-col items-center p-4" style="gap: 10px; position: relative; z-index: 1;">
+            <div class="crop-checkmark" style="position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: #A8E63D; display: flex; align-items: center; justify-content: center; z-index: 2;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6L5 9L10 3" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="crop-illustration-bg crop-emoji-wrap">
+              <span>🌾</span>
+            </div>
+            <div class="text-center" style="width: 100%;">
+              <div class="font-heading" style="font-size: 14px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Rice</div>
+              <div class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.55); font-weight: 400; margin-top: 1px;">धान / चावल</div>
+            </div>
+            <div class="crop-active-bar" style="width: 100%; height: 2px; border-radius: 1px; background: linear-gradient(90deg, #A8E63D, #C4F135);"></div>
+          </div>
+        </div>
+
+        <!-- Cotton -->
+        <div class="crop-card card-anim-3" data-crop="cotton" onclick="toggleCrop(this)">
+          <div class="flex flex-col items-center p-4" style="gap: 10px; position: relative; z-index: 1;">
+            <div class="crop-checkmark" style="position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: #A8E63D; display: flex; align-items: center; justify-content: center; z-index: 2;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6L5 9L10 3" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="crop-illustration-bg crop-emoji-wrap">
+              <span>🌿</span>
+            </div>
+            <div class="text-center" style="width: 100%;">
+              <div class="font-heading" style="font-size: 14px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Cotton</div>
+              <div class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.55); font-weight: 400; margin-top: 1px;">कपास</div>
+            </div>
+            <div class="crop-active-bar" style="width: 100%; height: 2px; border-radius: 1px; background: linear-gradient(90deg, #A8E63D, #C4F135);"></div>
+          </div>
+        </div>
+
+        <!-- Tomato -->
+        <div class="crop-card card-anim-4" data-crop="tomato" onclick="toggleCrop(this)">
+          <div class="flex flex-col items-center p-4" style="gap: 10px; position: relative; z-index: 1;">
+            <div class="crop-checkmark" style="position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: #A8E63D; display: flex; align-items: center; justify-content: center; z-index: 2;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6L5 9L10 3" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="crop-illustration-bg crop-emoji-wrap">
+              <span>🍅</span>
+            </div>
+            <div class="text-center" style="width: 100%;">
+              <div class="font-heading" style="font-size: 14px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Tomato</div>
+              <div class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.55); font-weight: 400; margin-top: 1px;">टमाटर</div>
+            </div>
+            <div class="crop-active-bar" style="width: 100%; height: 2px; border-radius: 1px; background: linear-gradient(90deg, #A8E63D, #C4F135);"></div>
+          </div>
+        </div>
+
+        <!-- Onion -->
+        <div class="crop-card card-anim-5" data-crop="onion" onclick="toggleCrop(this)">
+          <div class="flex flex-col items-center p-4" style="gap: 10px; position: relative; z-index: 1;">
+            <div class="crop-checkmark" style="position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: #A8E63D; display: flex; align-items: center; justify-content: center; z-index: 2;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6L5 9L10 3" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="crop-illustration-bg crop-emoji-wrap">
+              <span>🧅</span>
+            </div>
+            <div class="text-center" style="width: 100%;">
+              <div class="font-heading" style="font-size: 14px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Onion</div>
+              <div class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.55); font-weight: 400; margin-top: 1px;">प्याज</div>
+            </div>
+            <div class="crop-active-bar" style="width: 100%; height: 2px; border-radius: 1px; background: linear-gradient(90deg, #A8E63D, #C4F135);"></div>
+          </div>
+        </div>
+
+        <!-- Sugarcane -->
+        <div class="crop-card card-anim-6" data-crop="sugarcane" onclick="toggleCrop(this)">
+          <div class="flex flex-col items-center p-4" style="gap: 10px; position: relative; z-index: 1;">
+            <div class="crop-checkmark" style="position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: #A8E63D; display: flex; align-items: center; justify-content: center; z-index: 2;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6L5 9L10 3" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="crop-illustration-bg crop-emoji-wrap">
+              <span>🎋</span>
+            </div>
+            <div class="text-center" style="width: 100%;">
+              <div class="font-heading" style="font-size: 14px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Sugarcane</div>
+              <div class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.55); font-weight: 400; margin-top: 1px;">गन्ना</div>
+            </div>
+            <div class="crop-active-bar" style="width: 100%; height: 2px; border-radius: 1px; background: linear-gradient(90deg, #A8E63D, #C4F135);"></div>
+          </div>
+        </div>
+
+        <!-- Chilli -->
+        <div class="crop-card card-anim-7" data-crop="chilli" onclick="toggleCrop(this)">
+          <div class="flex flex-col items-center p-4" style="gap: 10px; position: relative; z-index: 1;">
+            <div class="crop-checkmark" style="position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: #A8E63D; display: flex; align-items: center; justify-content: center; z-index: 2;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6L5 9L10 3" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="crop-illustration-bg crop-emoji-wrap">
+              <span>🌶️</span>
+            </div>
+            <div class="text-center" style="width: 100%;">
+              <div class="font-heading" style="font-size: 14px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Chilli</div>
+              <div class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.55); font-weight: 400; margin-top: 1px;">मिर्च</div>
+            </div>
+            <div class="crop-active-bar" style="width: 100%; height: 2px; border-radius: 1px; background: linear-gradient(90deg, #A8E63D, #C4F135);"></div>
+          </div>
+        </div>
+
+        <!-- Maize -->
+        <div class="crop-card card-anim-8" data-crop="maize" onclick="toggleCrop(this)">
+          <div class="flex flex-col items-center p-4" style="gap: 10px; position: relative; z-index: 1;">
+            <div class="crop-checkmark" style="position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: #A8E63D; display: flex; align-items: center; justify-content: center; z-index: 2;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6L5 9L10 3" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="crop-illustration-bg crop-emoji-wrap">
+              <span>🌽</span>
+            </div>
+            <div class="text-center" style="width: 100%;">
+              <div class="font-heading" style="font-size: 14px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Maize</div>
+              <div class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.55); font-weight: 400; margin-top: 1px;">मक्का</div>
+            </div>
+            <div class="crop-active-bar" style="width: 100%; height: 2px; border-radius: 1px; background: linear-gradient(90deg, #A8E63D, #C4F135);"></div>
+          </div>
+        </div>
+
+        <!-- Soybean -->
+        <div class="crop-card card-anim-9" data-crop="soybean" onclick="toggleCrop(this)">
+          <div class="flex flex-col items-center p-4" style="gap: 10px; position: relative; z-index: 1;">
+            <div class="crop-checkmark" style="position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: #A8E63D; display: flex; align-items: center; justify-content: center; z-index: 2;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6L5 9L10 3" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="crop-illustration-bg crop-emoji-wrap">
+              <span>🫘</span>
+            </div>
+            <div class="text-center" style="width: 100%;">
+              <div class="font-heading" style="font-size: 14px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Soybean</div>
+              <div class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.55); font-weight: 400; margin-top: 1px;">सोयाबीन</div>
+            </div>
+            <div class="crop-active-bar" style="width: 100%; height: 2px; border-radius: 1px; background: linear-gradient(90deg, #A8E63D, #C4F135);"></div>
+          </div>
+        </div>
+
+        <!-- Mustard -->
+        <div class="crop-card card-anim-10" data-crop="mustard" onclick="toggleCrop(this)">
+          <div class="flex flex-col items-center p-4" style="gap: 10px; position: relative; z-index: 1;">
+            <div class="crop-checkmark" style="position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; border-radius: 50%; background: #A8E63D; display: flex; align-items: center; justify-content: center; z-index: 2;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6L5 9L10 3" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="crop-illustration-bg crop-emoji-wrap">
+              <span>🌻</span>
+            </div>
+            <div class="text-center" style="width: 100%;">
+              <div class="font-heading" style="font-size: 14px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Mustard</div>
+              <div class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.55); font-weight: 400; margin-top: 1px;">सरसों</div>
+            </div>
+            <div class="crop-active-bar" style="width: 100%; height: 2px; border-radius: 1px; background: linear-gradient(90deg, #A8E63D, #C4F135);"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom padding for sticky bar -->
+      <div style="height: 100px;"></div>
+
+    </div>
+
+    <!-- Sticky Bottom Bar -->
+    <div class="sticky-bottom-bar w-full px-5 py-4">
+      <!-- Selected count row -->
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <div id="countBadge" style="min-width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #A8E63D, #C4F135); display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(168,230,61,0.4);">
+            <span id="selectedCount" class="font-heading" style="font-size: 13px; font-weight: 800; color: #0F3D22;">0</span>
+          </div>
+          <div>
+            <span id="selectedLabel" class="font-body" style="font-size: 13px; color: rgba(15,61,34,0.55); font-weight: 400;">No crops selected</span>
+          </div>
+        </div>
+        <!-- Select all / clear -->
+        <button onclick="clearAll()" id="clearBtn" class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.4); background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: var(--radius-small); display: none;">
+          Clear all
+        </button>
+      </div>
+
+      <!-- Continue CTA -->
+      <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/onboarding-farm-profile-setup" id="continueBtn" class="continue-btn disabled flex items-center justify-center w-full" style="height: 56px; text-decoration: none;">
+        <span class="font-heading" style="font-size: 16px; font-weight: 700; color: #0F3D22; letter-spacing: 1px;">Continue</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-left: 8px;">
+          <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="#0F3D22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+
+      <!-- Flow navigation hints -->
+      <div class="flex items-center justify-center gap-4 mt-3">
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/splash-launch-screen" class="font-body" style="font-size: 11px; color: rgba(15,61,34,0.3); text-decoration: none; letter-spacing: 0.3px;">Splash</a>
+        <div style="width: 3px; height: 3px; border-radius: 50%; background: rgba(15,61,34,0.15);"></div>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/language-selection" class="font-body" style="font-size: 11px; color: rgba(15,61,34,0.3); text-decoration: none; letter-spacing: 0.3px;">Language</a>
+        <div style="width: 3px; height: 3px; border-radius: 50%; background: rgba(15,61,34,0.15);"></div>
+        <span class="font-body" style="font-size: 11px; color: #A8E63D; font-weight: 600; letter-spacing: 0.3px;">Crops</span>
+        <div style="width: 3px; height: 3px; border-radius: 50%; background: rgba(15,61,34,0.15);"></div>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/onboarding-farm-profile-setup" class="font-body" style="font-size: 11px; color: rgba(15,61,34,0.3); text-decoration: none; letter-spacing: 0.3px;">Farm Profile →</a>
+      </div>
+
+      <!-- Bottom safe area indicator -->
+      <div class="flex items-center justify-center mt-4 mb-1">
+        <div style="width: 120px; height: 4px; border-radius: 2px; background: rgba(15,61,34,0.1);"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let selectedCrops = new Set();
+
+    function toggleCrop(card) {
+      const crop = card.getAttribute('data-crop');
+
+      if (selectedCrops.has(crop)) {
+        selectedCrops.delete(crop);
+        card.classList.remove('selected');
+      } else {
+        selectedCrops.add(crop);
+        card.classList.add('selected');
+      }
+
+      updateBottomBar();
+    }
+
+    function clearAll() {
+      selectedCrops.clear();
+      document.querySelectorAll('.crop-card').forEach(function(c) {
+        c.classList.remove('selected');
+      });
+      updateBottomBar();
+    }
+
+    function updateBottomBar() {
+      const count = selectedCrops.size;
+      const countEl = document.getElementById('selectedCount');
+      const labelEl = document.getElementById('selectedLabel');
+      const continueBtn = document.getElementById('continueBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const countBadge = document.getElementById('countBadge');
+
+      // Animate count badge
+      countBadge.classList.remove('count-pop');
+      void countBadge.offsetWidth;
+      countBadge.classList.add('count-pop');
+
+      countEl.textContent = count;
+
+      if (count === 0) {
+        labelEl.textContent = 'No crops selected';
+        labelEl.style.color = 'rgba(15,61,34,0.4)';
+        continueBtn.classList.add('disabled');
+        clearBtn.style.display = 'none';
+        countBadge.style.background = 'rgba(15,61,34,0.08)';
+        countBadge.style.boxShadow = 'none';
+        countEl.style.color = 'rgba(15,61,34,0.3)';
+      } else if (count === 1) {
+        const cropName = Array.from(selectedCrops)[0];
+        const cropNameFormatted = cropName.charAt(0).toUpperCase() + cropName.slice(1);
+        labelEl.textContent = cropNameFormatted + ' selected';
+        labelEl.style.color = '#0F3D22';
+        continueBtn.classList.remove('disabled');
+        clearBtn.style.display = 'block';
+        countBadge.style.background = 'linear-gradient(135deg, #A8E63D, #C4F135)';
+        countBadge.style.boxShadow = '0 2px 8px rgba(168,230,61,0.4)';
+        countEl.style.color = '#0F3D22';
+      } else {
+        labelEl.textContent = count + ' crops selected';
+        labelEl.style.color = '#0F3D22';
+        continueBtn.classList.remove('disabled');
+        clearBtn.style.display = 'block';
+        countBadge.style.background = 'linear-gradient(135deg, #A8E63D, #C4F135)';
+        countBadge.style.boxShadow = '0 2px 8px rgba(168,230,61,0.4)';
+        countEl.style.color = '#0F3D22';
+      }
+    }
+
+    // Initialize
+    updateBottomBar();
+  </script>
+
+</body>
+</html>

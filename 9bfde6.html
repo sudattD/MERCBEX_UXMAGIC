@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en" style="height: auto; min-height: 100%;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MERCBEX – Cart & Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link id="heading-font-link" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link id="body-font-link" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['var(--font-heading-name)', 'sans-serif'],
+            body: ['var(--font-body-name)', 'sans-serif'],
+          },
+          spacing: {
+            base: 'var(--space-base)',
+          },
+          borderRadius: {
+            small: 'var(--radius-small)',
+            large: 'var(--radius-large)',
+          },
+          boxShadow: {
+            custom: 'var(--shadow-custom)',
+            'custom-hover': 'var(--shadow-custom-hover)',
+          },
+          colors: {
+            brand: {
+              dark: '#0F3D22',
+              mid: '#1A5C34',
+              light: '#2A7A48',
+              lime: '#A8E63D',
+              'lime-bright': '#C4F135',
+              'lime-soft': '#D4F76A',
+              'lime-pale': '#E8FBAA',
+            }
+          },
+          keyframes: {
+            progressLine: {
+              '0%': { width: '0%' },
+              '100%': { width: '100%' },
+            },
+            glowPulse: {
+              '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+              '50%': { opacity: '1', transform: 'scale(1.08)' },
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(24px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% center' },
+              '100%': { backgroundPosition: '200% center' },
+            },
+            ringExpand: {
+              '0%': { transform: 'scale(0.85)', opacity: '0.8' },
+              '100%': { transform: 'scale(1.35)', opacity: '0' },
+            }
+          },
+          animation: {
+            progressLine: 'progressLine 3.2s cubic-bezier(0.4,0,0.2,1) forwards',
+            glowPulse: 'glowPulse 2.8s ease-in-out infinite',
+            fadeUp: 'fadeUp 0.9s ease-out forwards',
+            'fadeUp-delay': 'fadeUp 0.9s ease-out 0.4s forwards',
+            'fadeUp-delay2': 'fadeUp 0.9s ease-out 0.7s forwards',
+            shimmer: 'shimmer 2.5s linear infinite',
+            ringExpand: 'ringExpand 2.4s ease-out infinite',
+            'ringExpand-delay': 'ringExpand 2.4s ease-out 1.2s infinite',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --font-heading-name: 'Syne';
+      --font-body-name: 'DM Sans';
+      --font-heading: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --letter-spacing-heading: 0.5px;
+      --letter-spacing-body: 0px;
+
+      --space-base: 1rem;
+
+      --radius-small: 6px;
+      --radius-large: 16px;
+      --border-width: 1.5px;
+
+      --shadow-color: 168 230 61;
+      --shadow-offset-x: 0px;
+      --shadow-offset-y: 0px;
+      --shadow-blur: 48px;
+      --shadow-spread: 0px;
+      --shadow-opacity: 0.35;
+      --shadow-custom: 0px 0px 48px 0px rgba(168, 230, 61, 0.35);
+      --shadow-custom-hover: 0px 0px 72px 0px rgba(168, 230, 61, 0.55);
+    }
+
+    .frosted-dark {
+      background: rgba(10, 28, 15, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    .frosted-card {
+      background: rgba(15, 40, 20, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(168, 230, 61, 0.14);
+    }
+
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #A8E63D 0%, #C4F135 100%);
+      border-radius: var(--radius-small);
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 0 24px rgba(168,230,61,0.5);
+      transform: translateY(-1px);
+    }
+
+    .qty-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-small);
+      background: rgba(168,230,61,0.1);
+      border: 1.5px solid rgba(168,230,61,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .qty-btn:hover {
+      background: rgba(168,230,61,0.2);
+      border-color: rgba(168,230,61,0.6);
+    }
+
+    .payment-card {
+      background: rgba(15, 40, 20, 0.85);
+      border: 1.5px solid rgba(168, 230, 61, 0.12);
+      border-radius: var(--radius-large);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .payment-card:hover {
+      border-color: rgba(168, 230, 61, 0.4);
+      background: rgba(15, 40, 20, 0.95);
+    }
+    .payment-card.selected {
+      border-color: #A8E63D;
+      background: rgba(168, 230, 61, 0.08);
+    }
+
+    .upi-option {
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-small);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .upi-option:hover {
+      border-color: rgba(168,230,61,0.35);
+      background: rgba(168,230,61,0.06);
+    }
+    .upi-option.selected {
+      border-color: #A8E63D;
+      background: rgba(168,230,61,0.1);
+    }
+
+    .promo-input {
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(168,230,61,0.2);
+      border-radius: var(--radius-small);
+      color: #FFFFFF;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .promo-input:focus {
+      border-color: rgba(168,230,61,0.6);
+    }
+    .promo-input::placeholder {
+      color: rgba(255,255,255,0.3);
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-up-1 { animation: fadeInUp 0.5s ease-out 0.1s forwards; opacity: 0; }
+    .fade-in-up-2 { animation: fadeInUp 0.5s ease-out 0.25s forwards; opacity: 0; }
+    .fade-in-up-3 { animation: fadeInUp 0.5s ease-out 0.4s forwards; opacity: 0; }
+    .fade-in-up-4 { animation: fadeInUp 0.5s ease-out 0.55s forwards; opacity: 0; }
+
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(168,230,61,0.2), transparent);
+    }
+
+    .sticky-pay-bar {
+      background: rgba(10, 28, 15, 0.97);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(168,230,61,0.2);
+    }
+
+    .tab-active-cart {
+      color: #A8E63D;
+      border-bottom: 2px solid #A8E63D;
+    }
+    .tab-inactive-cart {
+      color: rgba(255,255,255,0.4);
+      border-bottom: 2px solid transparent;
+    }
+
+    .remove-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .remove-btn:hover {
+      background: rgba(239,68,68,0.2);
+      border-color: rgba(239,68,68,0.5);
+    }
+
+    .bottom-nav-active { color: #A8E63D; }
+    .bottom-nav-inactive { color: rgba(255,255,255,0.35); }
+
+    .promo-applied {
+      background: rgba(168,230,61,0.08);
+      border: 1.5px solid rgba(168,230,61,0.4);
+      border-radius: var(--radius-small);
+    }
+  </style>
+</head>
+<body class="font-body" style="height: auto; min-height: 100%; background-color: #0A1A0D;">
+
+  <div style="max-width: 430px; margin: 0 auto; background: #0A1A0D; position: relative; padding-bottom: 100px;">
+
+    <!-- ===== TOP NAV BAR ===== -->
+    <div class="frosted-dark flex items-center justify-between px-5 pt-11 pb-4" style="position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(168,230,61,0.1);">
+      <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/product-detail-page" style="text-decoration: none; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M11 4L6 9L11 14" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="flex flex-col items-center gap-0.5">
+        <h1 class="font-heading" style="font-size: 14px; font-weight: 700; color: #FFFFFF; letter-spacing: 1.5px;">CART & CHECKOUT</h1>
+        <p class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.65); letter-spacing: 0.5px;">कार्ट और भुगतान</p>
+      </div>
+      <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/home-dashboard" style="text-decoration: none; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+          <path d="M2 7L8.5 2L15 7V15H11V11H6V15H2V7Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- ===== STEP INDICATOR ===== -->
+    <div class="px-5 pt-4 pb-0 fade-in-up-1">
+      <div class="flex items-center gap-0">
+        <!-- Step 1: Cart -->
+        <div class="flex flex-col items-center gap-1" id="step-cart-indicator">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #A8E63D, #C4F135); display: flex; align-items: center; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 2H3L4.5 9H10.5L12 5H4" stroke="#0F3D22" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="5.5" cy="11" r="0.9" fill="#0F3D22"/>
+              <circle cx="10" cy="11" r="0.9" fill="#0F3D22"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: #A8E63D; font-weight: 600; letter-spacing: 0.3px;">Cart</span>
+        </div>
+        <div style="flex: 1; height: 2px; background: linear-gradient(90deg, #A8E63D, rgba(168,230,61,0.3)); margin-bottom: 14px;"></div>
+        <!-- Step 2: Payment -->
+        <div class="flex flex-col items-center gap-1" id="step-payment-indicator">
+          <div id="step2-circle" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(168,230,61,0.12); border: 1.5px solid rgba(168,230,61,0.35); display: flex; align-items: center; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="1.5" y="3.5" width="11" height="8" rx="1.5" stroke="rgba(168,230,61,0.6)" stroke-width="1.4"/>
+              <path d="M1.5 6.5H12.5" stroke="rgba(168,230,61,0.6)" stroke-width="1.4"/>
+              <rect x="3" y="8.5" width="3" height="1.5" rx="0.5" fill="rgba(168,230,61,0.6)"/>
+            </svg>
+          </div>
+          <span id="step2-label" class="font-body" style="font-size: 9px; color: rgba(168,230,61,0.5); font-weight: 500; letter-spacing: 0.3px;">Payment</span>
+        </div>
+        <div style="flex: 1; height: 2px; background: rgba(168,230,61,0.15); margin-bottom: 14px;" id="step3-line"></div>
+        <!-- Step 3: Confirm -->
+        <div class="flex flex-col items-center gap-1">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2.5 7L5.5 10L11.5 4" stroke="rgba(255,255,255,0.3)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.25); font-weight: 500; letter-spacing: 0.3px;">Confirm</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CART / PAYMENT TABS ===== -->
+    <div class="px-5 pt-4 pb-0 fade-in-up-1">
+      <div class="flex items-center gap-0" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <button id="tab-cart-btn" onclick="showTab('cart')" class="tab-active-cart font-body pb-3 pr-6" style="font-size: 13px; font-weight: 600; background: none; border: none; cursor: pointer; letter-spacing: 0.3px; transition: all 0.2s;">
+          🛒 My Cart (2)
+        </button>
+        <button id="tab-payment-btn" onclick="showTab('payment')" class="tab-inactive-cart font-body pb-3" style="font-size: 13px; font-weight: 600; background: none; border: none; cursor: pointer; letter-spacing: 0.3px; transition: all 0.2s;">
+          💳 Payment
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- ===== CART TAB CONTENT ===== -->
+    <!-- ============================= -->
+    <div id="cart-tab">
+
+      <!-- ===== DELIVERY ADDRESS STRIP ===== -->
+      <div class="px-5 pt-4 fade-in-up-1">
+        <div class="frosted-card rounded-large p-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div style="width: 34px; height: 34px; border-radius: 10px; background: rgba(168,230,61,0.1); border: 1px solid rgba(168,230,61,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <path d="M7.5 1.5C5.01 1.5 3 3.51 3 6C3 9.75 7.5 13.5 7.5 13.5C7.5 13.5 12 9.75 12 6C12 3.51 9.99 1.5 7.5 1.5Z" stroke="#A8E63D" stroke-width="1.4"/>
+                <circle cx="7.5" cy="6" r="1.5" fill="#A8E63D"/>
+              </svg>
+            </div>
+            <div>
+              <p class="font-body" style="font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.3px; text-transform: uppercase;">Deliver to · डिलीवरी पता</p>
+              <p class="font-body" style="font-size: 12.5px; color: rgba(255,255,255,0.85); font-weight: 600; margin-top: 1px;">Ramesh Kumar, Kharif Farm, Pune 411001</p>
+            </div>
+          </div>
+          <button style="background: none; border: none; cursor: pointer; padding: 0; flex-shrink: 0;">
+            <span class="font-body" style="font-size: 11px; color: rgba(168,230,61,0.7); font-weight: 600;">Change</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== CART ITEMS ===== -->
+      <div class="px-5 pt-4 fade-in-up-2">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="font-heading" style="font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7); letter-spacing: 1px; text-transform: uppercase;">Items in Cart · आइटम</h2>
+          <span class="font-body" style="font-size: 11px; color: rgba(168,230,61,0.6);">2 items</span>
+        </div>
+
+        <!-- Cart Item 1 -->
+        <div class="frosted-card rounded-large p-3 mb-3" id="cart-item-1">
+          <div class="flex items-start gap-3">
+            <!-- Thumbnail -->
+            <div class="rounded-small overflow-hidden flex-shrink-0" style="width: 72px; height: 72px; border: 1px solid rgba(168,230,61,0.18);">
+              <img src="https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=144&h=144&fit=crop&crop=center" alt="Tilt 250 EC" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <!-- Details -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5 mb-1">
+                    <span style="background: rgba(168,230,61,0.1); border: 1px solid rgba(168,230,61,0.3); border-radius: 4px; padding: 1px 6px;">
+                      <span class="font-body" style="font-size: 8px; color: rgba(168,230,61,0.85); font-weight: 600;">FUNGICIDE</span>
+                    </span>
+                    <span style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 4px; padding: 1px 6px;">
+                      <span class="font-body" style="font-size: 8px; color: rgba(239,68,68,0.85); font-weight: 600;">13% OFF</span>
+                    </span>
+                  </div>
+                  <p class="font-heading" style="font-size: 13px; font-weight: 700; color: #FFFFFF; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Tilt 250 EC Fungicide</p>
+                  <p class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px;">250 ml · Syngenta India</p>
+                </div>
+                <!-- Remove button -->
+                <button class="remove-btn flex-shrink-0" onclick="removeItem(1)">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 2L10 10M10 2L2 10" stroke="rgba(239,68,68,0.8)" stroke-width="1.6" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+              <!-- Price + Stepper row -->
+              <div class="flex items-center justify-between mt-2.5">
+                <div class="flex items-baseline gap-1.5">
+                  <span class="font-heading" style="font-size: 18px; font-weight: 800; color: #A8E63D; line-height: 1;">₹485</span>
+                  <span class="font-body" style="font-size: 11px; color: rgba(255,255,255,0.3); text-decoration: line-through;">₹560</span>
+                </div>
+                <!-- Stepper -->
+                <div class="flex items-center gap-2">
+                  <button class="qty-btn" onclick="changeItemQty(1, -1)">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2.5 6H9.5" stroke="#A8E63D" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                  <span id="item1-qty" class="font-heading" style="font-size: 15px; font-weight: 800; color: #FFFFFF; min-width: 20px; text-align: center;">2</span>
+                  <button class="qty-btn" onclick="changeItemQty(1, 1)">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M6 2.5V9.5M2.5 6H9.5" stroke="#A8E63D" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Subtotal for item -->
+          <div class="flex items-center justify-between mt-2.5 pt-2.5" style="border-top: 1px solid rgba(255,255,255,0.07);">
+            <span class="font-body" style="font-size: 11px; color: rgba(255,255,255,0.4);">Item total · आइटम कुल</span>
+            <span id="item1-total" class="font-body" style="font-size: 12px; color: rgba(168,230,61,0.8); font-weight: 600;">₹970</span>
+          </div>
+        </div>
+
+        <!-- Cart Item 2 -->
+        <div class="frosted-card rounded-large p-3 mb-3" id="cart-item-2">
+          <div class="flex items-start gap-3">
+            <!-- Thumbnail -->
+            <div class="rounded-small overflow-hidden flex-shrink-0" style="width: 72px; height: 72px; border: 1px solid rgba(168,230,61,0.18);">
+              <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=144&h=144&fit=crop&crop=center" alt="Confidor 200 SL" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <!-- Details -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5 mb-1">
+                    <span style="background: rgba(96,165,250,0.1); border: 1px solid rgba(96,165,250,0.3); border-radius: 4px; padding: 1px 6px;">
+                      <span class="font-body" style="font-size: 8px; color: rgba(96,165,250,0.85); font-weight: 600;">INSECTICIDE</span>
+                    </span>
+                    <span style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 4px; padding: 1px 6px;">
+                      <span class="font-body" style="font-size: 8px; color: rgba(239,68,68,0.85); font-weight: 600;">8% OFF</span>
+                    </span>
+                  </div>
+                  <p class="font-heading" style="font-size: 13px; font-weight: 700; color: #FFFFFF; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Confidor 200 SL</p>
+                  <p class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px;">100 ml · Bayer CropScience</p>
+                </div>
+                <!-- Remove button -->
+                <button class="remove-btn flex-shrink-0" onclick="removeItem(2)">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2 2L10 10M10 2L2 10" stroke="rgba(239,68,68,0.8)" stroke-width="1.6" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+              <!-- Price + Stepper row -->
+              <div class="flex items-center justify-between mt-2.5">
+                <div class="flex items-baseline gap-1.5">
+                  <span class="font-heading" style="font-size: 18px; font-weight: 800; color: #A8E63D; line-height: 1;">₹320</span>
+                  <span class="font-body" style="font-size: 11px; color: rgba(255,255,255,0.3); text-decoration: line-through;">₹348</span>
+                </div>
+                <!-- Stepper -->
+                <div class="flex items-center gap-2">
+                  <button class="qty-btn" onclick="changeItemQty(2, -1)">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2.5 6H9.5" stroke="#A8E63D" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                  <span id="item2-qty" class="font-heading" style="font-size: 15px; font-weight: 800; color: #FFFFFF; min-width: 20px; text-align: center;">1</span>
+                  <button class="qty-btn" onclick="changeItemQty(2, 1)">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M6 2.5V9.5M2.5 6H9.5" stroke="#A8E63D" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Subtotal for item -->
+          <div class="flex items-center justify-between mt-2.5 pt-2.5" style="border-top: 1px solid rgba(255,255,255,0.07);">
+            <span class="font-body" style="font-size: 11px; color: rgba(255,255,255,0.4);">Item total · आइटम कुल</span>
+            <span id="item2-total" class="font-body" style="font-size: 12px; color: rgba(168,230,61,0.8); font-weight: 600;">₹320</span>
+          </div>
+        </div>
+
+        <!-- Add more products nudge -->
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/product-detail-page" style="text-decoration: none; display: block;">
+          <div class="rounded-large flex items-center justify-center gap-2 py-3" style="border: 1.5px dashed rgba(168,230,61,0.25); background: rgba(168,230,61,0.03);">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 2V12M2 7H12" stroke="rgba(168,230,61,0.5)" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <span class="font-body" style="font-size: 12px; color: rgba(168,230,61,0.6); font-weight: 500;">Add more products · और उत्पाद जोड़ें</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- ===== PROMO CODE ===== -->
+      <div class="px-5 pt-4 fade-in-up-3">
+        <div class="frosted-card rounded-large p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <rect x="1" y="4" width="13" height="8" rx="1.5" stroke="rgba(168,230,61,0.7)" stroke-width="1.3"/>
+              <path d="M5 4V3C5 2.17 5.67 1.5 6.5 1.5H8.5C9.33 1.5 10 2.17 10 3V4" stroke="rgba(168,230,61,0.7)" stroke-width="1.3"/>
+              <path d="M5 8H10" stroke="rgba(168,230,61,0.5)" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            <h3 class="font-heading" style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.75); letter-spacing: 0.5px; text-transform: uppercase;">Promo Code · प्रोमो कोड</h3>
+          </div>
+          <!-- Input row -->
+          <div class="flex items-center gap-2" id="promo-input-row">
+            <input id="promo-input" type="text" placeholder="Enter promo code · कोड दर्ज करें" class="promo-input flex-1 px-3 py-2.5" style="height: 42px;">
+            <button onclick="applyPromo()" class="btn-primary px-4 py-2.5 flex-shrink-0" style="height: 42px;">
+              <span class="font-heading" style="font-size: 12px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Apply</span>
+            </button>
+          </div>
+          <!-- Applied promo badge (hidden initially) -->
+          <div id="promo-applied-badge" style="display: none;" class="promo-applied flex items-center justify-between px-3 py-2.5 mt-2">
+            <div class="flex items-center gap-2">
+              <div style="width: 20px; height: 20px; border-radius: 50%; background: rgba(168,230,61,0.2); display: flex; align-items: center; justify-content: center;">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 5L4 7L8 3" stroke="#A8E63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <span class="font-heading" style="font-size: 12px; font-weight: 700; color: #A8E63D;">KISAN20</span>
+                <span class="font-body" style="font-size: 11px; color: rgba(168,230,61,0.7); margin-left: 6px;">– ₹258 saved!</span>
+              </div>
+            </div>
+            <button onclick="removePromo()" style="background: none; border: none; cursor: pointer;">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M3 3L11 11M11 3L3 11" stroke="rgba(168,230,61,0.6)" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <!-- Suggested codes -->
+          <div class="flex items-center gap-2 mt-3 flex-wrap">
+            <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.35);">Try:</span>
+            <button onclick="fillPromo('KISAN20')" style="background: rgba(168,230,61,0.06); border: 1px solid rgba(168,230,61,0.2); border-radius: 4px; padding: 3px 8px; cursor: pointer;">
+              <span class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.7); font-weight: 600;">KISAN20</span>
+            </button>
+            <button onclick="fillPromo('AGRI10')" style="background: rgba(168,230,61,0.06); border: 1px solid rgba(168,230,61,0.2); border-radius: 4px; padding: 3px 8px; cursor: pointer;">
+              <span class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.7); font-weight: 600;">AGRI10</span>
+            </button>
+            <button onclick="fillPromo('FIRST50')" style="background: rgba(168,230,61,0.06); border: 1px solid rgba(168,230,61,0.2); border-radius: 4px; padding: 3px 8px; cursor: pointer;">
+              <span class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.7); font-weight: 600;">FIRST50</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ORDER SUMMARY CARD ===== -->
+      <div class="px-5 pt-4 fade-in-up-3">
+        <div class="frosted-card rounded-large p-4">
+          <div class="flex items-center gap-2 mb-4">
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <path d="M2 2H3.5L5 10H11.5L13 5.5H4.5" stroke="rgba(168,230,61,0.7)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="6" cy="12.5" r="1" fill="rgba(168,230,61,0.7)"/>
+              <circle cx="11" cy="12.5" r="1" fill="rgba(168,230,61,0.7)"/>
+            </svg>
+            <h3 class="font-heading" style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.75); letter-spacing: 0.5px; text-transform: uppercase;">Order Summary · ऑर्डर सारांश</h3>
+          </div>
+
+          <!-- Line items -->
+          <div class="flex flex-col gap-0">
+            <div class="flex items-center justify-between py-2.5" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <span class="font-body" style="font-size: 13px; color: rgba(255,255,255,0.55);">Subtotal (3 items)</span>
+              <span id="summary-subtotal" class="font-body" style="font-size: 13px; color: rgba(255,255,255,0.8); font-weight: 500;">₹1,290</span>
+            </div>
+            <div class="flex items-center justify-between py-2.5" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <div class="flex items-center gap-1.5">
+                <span class="font-body" style="font-size: 13px; color: rgba(255,255,255,0.55);">Delivery Charges</span>
+                <span style="background: rgba(168,230,61,0.1); border: 1px solid rgba(168,230,61,0.25); border-radius: 3px; padding: 1px 5px;">
+                  <span class="font-body" style="font-size: 8px; color: rgba(168,230,61,0.8); font-weight: 600;">FREE</span>
+                </span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.3); text-decoration: line-through;">₹49</span>
+                <span class="font-body" style="font-size: 13px; color: #A8E63D; font-weight: 600;">₹0</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between py-2.5" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <span class="font-body" style="font-size: 13px; color: rgba(255,255,255,0.55);">GST (18%)</span>
+              <span id="summary-gst" class="font-body" style="font-size: 13px; color: rgba(255,255,255,0.8); font-weight: 500;">₹232</span>
+            </div>
+            <div class="flex items-center justify-between py-2.5" id="promo-discount-row" style="border-bottom: 1px solid rgba(255,255,255,0.06); display: none !important;">
+              <div class="flex items-center gap-1.5">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M2 6L4.5 8.5L10 3" stroke="#A8E63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="font-body" style="font-size: 13px; color: rgba(168,230,61,0.8);">Promo (KISAN20)</span>
+              </div>
+              <span class="font-body" style="font-size: 13px; color: #A8E63D; font-weight: 600;">–₹258</span>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="section-divider my-3"></div>
+
+          <!-- Total -->
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="font-heading" style="font-size: 15px; font-weight: 800; color: #FFFFFF; letter-spacing: 0.3px;">Total Payable · कुल देय</p>
+              <p class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 1px;">Inclusive of all taxes</p>
+            </div>
+            <div class="text-right">
+              <p id="summary-total" class="font-heading" style="font-size: 26px; font-weight: 800; color: #A8E63D; line-height: 1; letter-spacing: -0.5px;">₹1,522</p>
+              <p class="font-body" style="font-size: 10px; color: rgba(239,68,68,0.7); margin-top: 2px;">You save ₹107 total</p>
+            </div>
+          </div>
+
+          <!-- Savings highlight -->
+          <div class="mt-3 rounded-small flex items-center gap-2 px-3 py-2" style="background: rgba(168,230,61,0.06); border: 1px solid rgba(168,230,61,0.18);">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <circle cx="6.5" cy="6.5" r="5.5" stroke="rgba(168,230,61,0.6)" stroke-width="1.2"/>
+              <path d="M4.5 6.5L6 8L8.5 5" stroke="rgba(168,230,61,0.6)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="font-body" style="font-size: 11px; color: rgba(168,230,61,0.75); font-weight: 500;">Free delivery applied! Orders above ₹999 qualify.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TRUST BADGES ===== -->
+      <div class="px-5 pt-4 pb-4 fade-in-up-4">
+        <div class="grid grid-cols-3 gap-2">
+          <div class="frosted-card rounded-large p-3 flex flex-col items-center gap-1.5 text-center">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2L3 5V10C3 14.4 6.1 18.5 10 19.5C13.9 18.5 17 14.4 17 10V5L10 2Z" stroke="rgba(168,230,61,0.6)" stroke-width="1.4" stroke-linejoin="round"/>
+              <path d="M7 10L9 12L13 8" stroke="rgba(168,230,61,0.6)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.6); line-height: 1.3;">100% Genuine Products</span>
+          </div>
+          <div class="frosted-card rounded-large p-3 flex flex-col items-center gap-1.5 text-center">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M3 10L5 8L7 10L9 8L11 10L13 8L15 10L17 8" stroke="rgba(168,230,61,0.6)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 14L5 12L7 14L9 12L11 14L13 12L15 14L17 12" stroke="rgba(168,230,61,0.4)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.6); line-height: 1.3;">Easy 7-Day Returns</span>
+          </div>
+          <div class="frosted-card rounded-large p-3 flex flex-col items-center gap-1.5 text-center">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="5" width="16" height="11" rx="2" stroke="rgba(168,230,61,0.6)" stroke-width="1.4"/>
+              <path d="M2 9H18" stroke="rgba(168,230,61,0.6)" stroke-width="1.4"/>
+              <rect x="4" y="11.5" width="4" height="2" rx="0.5" fill="rgba(168,230,61,0.5)"/>
+            </svg>
+            <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.6); line-height: 1.3;">Secure Payments</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- END CART TAB -->
+
+    <!-- ================================= -->
+    <!-- ===== PAYMENT TAB CONTENT ===== -->
+    <!-- ================================= -->
+    <div id="payment-tab" style="display: none;">
+
+      <!-- ===== ORDER MINI SUMMARY ===== -->
+      <div class="px-5 pt-4 fade-in-up-1">
+        <div class="frosted-card rounded-large p-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div style="width: 34px; height: 34px; border-radius: 10px; background: rgba(168,230,61,0.1); border: 1px solid rgba(168,230,61,0.25); display: flex; align-items: center; justify-content: center;">
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <path d="M2 2H3.5L5 10H11.5L13 5.5H4.5" stroke="#A8E63D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="6" cy="12.5" r="1" fill="#A8E63D"/>
+                <circle cx="11" cy="12.5" r="1" fill="#A8E63D"/>
+              </svg>
+            </div>
+            <div>
+              <p class="font-body" style="font-size: 11px; color: rgba(255,255,255,0.4);">3 items · Free delivery</p>
+              <p class="font-heading" style="font-size: 15px; font-weight: 800; color: #A8E63D; line-height: 1.2;">₹1,522 payable</p>
+            </div>
+          </div>
+          <button onclick="showTab('cart')" style="background: none; border: none; cursor: pointer; padding: 0;">
+            <span class="font-body" style="font-size: 11px; color: rgba(168,230,61,0.6); font-weight: 600;">Edit Cart</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== UPI PAYMENT ===== -->
+      <div class="px-5 pt-4 fade-in-up-2">
+        <div class="payment-card selected p-4" id="payment-upi" onclick="selectPayment('upi')">
+          <!-- Header row -->
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2.5">
+              <!-- Radio -->
+              <div id="radio-upi" style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid #A8E63D; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: #A8E63D;"></div>
+              </div>
+              <div>
+                <p class="font-heading" style="font-size: 14px; font-weight: 700; color: #FFFFFF; letter-spacing: 0.3px;">UPI Payment</p>
+                <p class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.6);">यूपीआई भुगतान · Instant transfer</p>
+              </div>
+            </div>
+            <span style="background: rgba(168,230,61,0.12); border: 1px solid rgba(168,230,61,0.3); border-radius: 4px; padding: 2px 8px;">
+              <span class="font-body" style="font-size: 9px; color: rgba(168,230,61,0.85); font-weight: 600;">RECOMMENDED</span>
+            </span>
+          </div>
+
+          <!-- UPI App options -->
+          <div class="grid grid-cols-3 gap-2.5" id="upi-options">
+            <!-- GPay -->
+            <div class="upi-option selected flex flex-col items-center gap-2 py-3 px-2" id="upi-gpay" onclick="selectUPI('gpay', event)">
+              <div style="width: 40px; height: 40px; border-radius: 10px; overflow: hidden; background: #FFFFFF; display: flex; align-items: center; justify-content: center;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="GPay" style="width: 32px; height: 32px; object-fit: contain;">
+              </div>
+              <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.75); font-weight: 600;">GPay</span>
+            </div>
+            <!-- PhonePe -->
+            <div class="upi-option flex flex-col items-center gap-2 py-3 px-2" id="upi-phonepe" onclick="selectUPI('phonepe', event)">
+              <div style="width: 40px; height: 40px; border-radius: 10px; overflow: hidden; background: #5F259F; display: flex; align-items: center; justify-content: center;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/512px-PhonePe_Logo.svg.png" alt="PhonePe" style="width: 32px; height: 32px; object-fit: contain;">
+              </div>
+              <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.75); font-weight: 600;">PhonePe</span>
+            </div>
+            <!-- Paytm -->
+            <div class="upi-option flex flex-col items-center gap-2 py-3 px-2" id="upi-paytm" onclick="selectUPI('paytm', event)">
+              <div style="width: 40px; height: 40px; border-radius: 10px; overflow: hidden; background: #00BAF2; display: flex; align-items: center; justify-content: center;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/512px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm" style="width: 32px; height: 32px; object-fit: contain;">
+              </div>
+              <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.75); font-weight: 600;">Paytm</span>
+            </div>
+          </div>
+
+          <!-- UPI ID input -->
+          <div class="mt-3 pt-3" style="border-top: 1px solid rgba(255,255,255,0.07);">
+            <p class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px;">Or enter UPI ID · या UPI ID दर्ज करें</p>
+            <div class="flex items-center gap-2">
+              <input type="text" placeholder="yourname@upi" class="promo-input flex-1 px-3 py-2" style="height: 38px; font-size: 12px;">
+              <button class="btn-primary px-3 py-2 flex-shrink-0" style="height: 38px;">
+                <span class="font-heading" style="font-size: 11px; font-weight: 700; color: #0F3D22;">Verify</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== NET BANKING ===== -->
+      <div class="px-5 pt-3 fade-in-up-2">
+        <div class="payment-card p-4" id="payment-netbanking" onclick="selectPayment('netbanking')">
+          <div class="flex items-center gap-2.5">
+            <div id="radio-netbanking" style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <div style="width: 10px; height: 10px; border-radius: 50%; background: transparent;"></div>
+            </div>
+            <div class="flex-1">
+              <p class="font-heading" style="font-size: 14px; font-weight: 700; color: #FFFFFF; letter-spacing: 0.3px;">Net Banking</p>
+              <p class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.4);">नेट बैंकिंग · All major banks supported</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <div style="width: 28px; height: 18px; border-radius: 3px; background: #003087; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 7px; color: white; font-weight: 800; letter-spacing: 0.3px;">SBI</span>
+              </div>
+              <div style="width: 28px; height: 18px; border-radius: 3px; background: #E31837; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 7px; color: white; font-weight: 800; letter-spacing: 0.3px;">HDFC</span>
+              </div>
+              <div style="width: 28px; height: 18px; border-radius: 3px; background: #F37021; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 7px; color: white; font-weight: 800; letter-spacing: 0.3px;">ICICI</span>
+              </div>
+            </div>
+          </div>
+          <!-- Expanded bank select (hidden by default) -->
+          <div id="netbanking-expanded" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.07);">
+            <p class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px;">Select your bank</p>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="flex items-center gap-2 px-3 py-2 rounded-small" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #003087;"></div>
+                <span class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7);">State Bank of India</span>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-small" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #E31837;"></div>
+                <span class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7);">HDFC Bank</span>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-small" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #F37021;"></div>
+                <span class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7);">ICICI Bank</span>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-small" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #1B4F9B;"></div>
+                <span class="font-body" style="font-size: 12px; color: rgba(255,255,255,0.7);">Axis Bank</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CASH ON DELIVERY ===== -->
+      <div class="px-5 pt-3 fade-in-up-3">
+        <div class="payment-card p-4" id="payment-cod" onclick="selectPayment('cod')">
+          <div class="flex items-center gap-2.5">
+            <div id="radio-cod" style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <div style="width: 10px; height: 10px; border-radius: 50%; background: transparent;"></div>
+            </div>
+            <div class="flex-1">
+              <p class="font-heading" style="font-size: 14px; font-weight: 700; color: #FFFFFF; letter-spacing: 0.3px;">Cash on Delivery</p>
+              <p class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.4);">कैश ऑन डिलीवरी · Pay when delivered</p>
+            </div>
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <rect x="1.5" y="4" width="13" height="9" rx="1.5" stroke="rgba(245,158,11,0.7)" stroke-width="1.3"/>
+                <circle cx="8" cy="8.5" r="2" stroke="rgba(245,158,11,0.7)" stroke-width="1.3"/>
+                <path d="M1.5 7H14.5" stroke="rgba(245,158,11,0.4)" stroke-width="1" stroke-dasharray="2 2"/>
+              </svg>
+            </div>
+          </div>
+          <!-- COD note -->
+          <div id="cod-expanded" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.07);">
+            <div class="flex items-start gap-2 rounded-small px-3 py-2.5" style="background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2);">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink: 0; margin-top: 1px;">
+                <path d="M7 1.5L12.5 11.5H1.5L7 1.5Z" stroke="rgba(245,158,11,0.7)" stroke-width="1.3" stroke-linejoin="round"/>
+                <path d="M7 5.5V8" stroke="rgba(245,158,11,0.7)" stroke-width="1.4" stroke-linecap="round"/>
+                <circle cx="7" cy="10" r="0.7" fill="rgba(245,158,11,0.7)"/>
+              </svg>
+              <p class="font-body" style="font-size: 11px; color: rgba(245,158,11,0.8); line-height: 1.5;">COD available for orders up to ₹5,000. Please keep exact change ready. Additional ₹30 handling fee applies.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECURITY NOTE ===== -->
+      <div class="px-5 pt-4 pb-4 fade-in-up-4">
+        <div class="flex items-center justify-center gap-2">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <path d="M6.5 1L2 3V6.5C2 9.5 4 12 6.5 12.5C9 12 11 9.5 11 6.5V3L6.5 1Z" stroke="rgba(168,230,61,0.4)" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M4.5 6.5L6 8L9 5" stroke="rgba(168,230,61,0.4)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="font-body" style="font-size: 11px; color: rgba(255,255,255,0.3);">256-bit SSL encrypted · Secured by RazorPay</span>
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <path d="M6.5 1L2 3V6.5C2 9.5 4 12 6.5 12.5C9 12 11 9.5 11 6.5V3L6.5 1Z" stroke="rgba(168,230,61,0.4)" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M4.5 6.5L6 8L9 5" stroke="rgba(168,230,61,0.4)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+    <!-- END PAYMENT TAB -->
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <div class="frosted-dark" style="position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; z-index: 40; border-top: 1px solid rgba(168,230,61,0.12); padding: 10px 20px 20px;">
+      <div class="flex items-center justify-around">
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/home-dashboard" class="flex flex-col items-center gap-1" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 6.5L8 2L14 6.5V14H10V10H6V14H2V6.5Z" stroke="rgba(255,255,255,0.45)" stroke-width="1.4" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.3px;">Home</span>
+        </a>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/crop-scan-screen" class="flex flex-col items-center gap-1" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="2" width="12" height="12" rx="2.5" stroke="rgba(255,255,255,0.45)" stroke-width="1.4"/>
+              <circle cx="8" cy="8" r="2.5" stroke="rgba(255,255,255,0.45)" stroke-width="1.4"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.3px;">Scan</span>
+        </a>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/disease-detection-result" class="flex flex-col items-center gap-1" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="6" stroke="rgba(255,255,255,0.45)" stroke-width="1.4"/>
+              <path d="M5 8L7 10L11 6" stroke="rgba(255,255,255,0.45)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.3px;">Results</span>
+        </a>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/cart-checkout" class="flex flex-col items-center gap-1" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(168,230,61,0.15); border: 1px solid rgba(168,230,61,0.35); display: flex; align-items: center; justify-content: center; position: relative;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 2H3.5L5.5 10H12L14 5H4.5" stroke="#A8E63D" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="6.5" cy="12.5" r="1" fill="#A8E63D"/>
+              <circle cx="11.5" cy="12.5" r="1" fill="#A8E63D"/>
+            </svg>
+            <div style="position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; background: #EF4444; border: 1.5px solid #0A1A0D; display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 5px; color: white; font-weight: 700;">2</span>
+            </div>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: #A8E63D; font-weight: 600; letter-spacing: 0.3px;">Cart</span>
+        </a>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/profile-settings" class="flex flex-col items-center gap-1" style="text-decoration: none;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="5" r="2.5" stroke="rgba(255,255,255,0.45)" stroke-width="1.4"/>
+              <path d="M3 14C3 11.8 5.2 10 8 10C10.8 10 13 11.8 13 14" stroke="rgba(255,255,255,0.45)" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.3px;">Profile</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- ===== STICKY PROCEED TO PAY CTA ===== -->
+    <div class="sticky-pay-bar" style="position: fixed; bottom: 68px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; z-index: 39; padding: 12px 20px;">
+      <div class="flex items-center justify-between gap-3">
+        <!-- Amount summary -->
+        <div class="flex flex-col">
+          <div class="flex items-baseline gap-1.5">
+            <span class="font-heading" style="font-size: 22px; font-weight: 800; color: #A8E63D; line-height: 1;">₹1,522</span>
+            <span class="font-body" style="font-size: 11px; color: rgba(255,255,255,0.3); text-decoration: line-through;">₹1,629</span>
+          </div>
+          <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.4);">3 items · Free delivery</span>
+        </div>
+        <!-- CTA -->
+        <button id="main-cta-btn" onclick="handleMainCTA()" class="btn-primary flex items-center justify-center gap-2 px-6 py-3.5 flex-shrink-0">
+          <span id="cta-text" class="font-heading" style="font-size: 14px; font-weight: 800; color: #0F3D22; letter-spacing: 0.5px; white-space: nowrap;">Proceed to Pay →</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ===== TAB SWITCHING =====
+    var currentTab = 'cart';
+
+    function showTab(tab) {
+      currentTab = tab;
+      var cartTab = document.getElementById('cart-tab');
+      var paymentTab = document.getElementById('payment-tab');
+      var cartBtn = document.getElementById('tab-cart-btn');
+      var paymentBtn = document.getElementById('tab-payment-btn');
+      var ctaText = document.getElementById('cta-text');
+      var step2Circle = document.getElementById('step2-circle');
+      var step2Label = document.getElementById('step2-label');
+
+      if (tab === 'cart') {
+        cartTab.style.display = 'block';
+        paymentTab.style.display = 'none';
+        cartBtn.className = 'tab-active-cart font-body pb-3 pr-6';
+        paymentBtn.className = 'tab-inactive-cart font-body pb-3';
+        ctaText.textContent = 'Proceed to Pay →';
+        step2Circle.style.background = 'rgba(168,230,61,0.12)';
+        step2Circle.style.borderColor = 'rgba(168,230,61,0.35)';
+        step2Label.style.color = 'rgba(168,230,61,0.5)';
+      } else {
+        cartTab.style.display = 'none';
+        paymentTab.style.display = 'block';
+        cartBtn.className = 'tab-inactive-cart font-body pb-3 pr-6';
+        paymentBtn.className = 'tab-active-cart font-body pb-3';
+        ctaText.textContent = 'Pay ₹1,522 Now →';
+        step2Circle.style.background = 'linear-gradient(135deg, #A8E63D, #C4F135)';
+        step2Circle.style.borderColor = '#A8E63D';
+        step2Label.style.color = '#A8E63D';
+        step2Label.style.fontWeight = '600';
+      }
+    }
+
+    function handleMainCTA() {
+      if (currentTab === 'cart') {
+        showTab('payment');
+      } else {
+        // Simulate payment processing
+        var btn = document.getElementById('main-cta-btn');
+        var ctaText = document.getElementById('cta-text');
+        btn.style.opacity = '0.7';
+        ctaText.textContent = 'Processing...';
+        setTimeout(function() {
+          btn.style.opacity = '1';
+          ctaText.textContent = '✓ Order Placed!';
+          btn.style.background = 'linear-gradient(135deg, #22C55E, #16A34A)';
+          setTimeout(function() {
+            ctaText.textContent = 'Pay ₹1,522 Now →';
+            btn.style.background = 'linear-gradient(135deg, #A8E63D 0%, #C4F135 100%)';
+          }, 2500);
+        }, 1500);
+      }
+    }
+
+    // ===== QUANTITY STEPPER =====
+    var item1Qty = 2;
+    var item2Qty = 1;
+    var item1Price = 485;
+    var item2Price = 320;
+
+    function changeItemQty(itemId, delta) {
+      if (itemId === 1) {
+        item1Qty = Math.max(1, Math.min(99, item1Qty + delta));
+        document.getElementById('item1-qty').textContent = item1Qty;
+        document.getElementById('item1-total').textContent = '₹' + (item1Price * item1Qty).toLocaleString('en-IN');
+      } else {
+        item2Qty = Math.max(1, Math.min(99, item2Qty + delta));
+        document.getElementById('item2-qty').textContent = item2Qty;
+        document.getElementById('item2-total').textContent = '₹' + (item2Price * item2Qty).toLocaleString('en-IN');
+      }
+      updateSummary();
+    }
+
+    function updateSummary() {
+      var subtotal = (item1Price * item1Qty) + (item2Price * item2Qty);
+      var gst = Math.round(subtotal * 0.18);
+      var total = subtotal + gst;
+      document.getElementById('summary-subtotal').textContent = '₹' + subtotal.toLocaleString('en-IN');
+      document.getElementById('summary-gst').textContent = '₹' + gst.toLocaleString('en-IN');
+      document.getElementById('summary-total').textContent = '₹' + total.toLocaleString('en-IN');
+    }
+
+    // ===== REMOVE ITEM =====
+    function removeItem(itemId) {
+      var el = document.getElementById('cart-item-' + itemId);
+      if (el) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateX(20px)';
+        el.style.transition = 'opacity 0.3s, transform 0.3s';
+        setTimeout(function() {
+          el.style.display = 'none';
+          if (itemId === 1) item1Qty = 0;
+          else item2Qty = 0;
+          updateSummary();
+        }, 300);
+      }
+    }
+
+    // ===== PROMO CODE =====
+    var promoApplied = false;
+
+    function fillPromo(code) {
+      document.getElementById('promo-input').value = code;
+    }
+
+    function applyPromo() {
+      var code = document.getElementById('promo-input').value.trim().toUpperCase();
+      if (code === 'KISAN20' || code === 'AGRI10' || code === 'FIRST50') {
+        promoApplied = true;
+        document.getElementById('promo-input-row').style.display = 'none';
+        document.getElementById('promo-applied-badge').style.display = 'flex';
+        document.getElementById('promo-discount-row').style.display = 'flex';
+        document.getElementById('promo-discount-row').style.removeProperty('display');
+        document.getElementById('promo-discount-row').style.display = 'flex';
+      } else {
+        document.getElementById('promo-input').style.borderColor = 'rgba(239,68,68,0.6)';
+        setTimeout(function() {
+          document.getElementById('promo-input').style.borderColor = 'rgba(168,230,61,0.2)';
+        }, 1500);
+      }
+    }
+
+    function removePromo() {
+      promoApplied = false;
+      document.getElementById('promo-input-row').style.display = 'flex';
+      document.getElementById('promo-applied-badge').style.display = 'none';
+      document.getElementById('promo-discount-row').style.display = 'none';
+      document.getElementById('promo-input').value = '';
+    }
+
+    // ===== PAYMENT SELECTION =====
+    var selectedPayment = 'upi';
+    var selectedUPIApp = 'gpay';
+
+    function selectPayment(method) {
+      var methods = ['upi', 'netbanking', 'cod'];
+      methods.forEach(function(m) {
+        var card = document.getElementById('payment-' + m);
+        var radio = document.getElementById('radio-' + m);
+        if (m === method) {
+          card.classList.add('selected');
+          radio.style.borderColor = '#A8E63D';
+          radio.querySelector('div').style.background = '#A8E63D';
+        } else {
+          card.classList.remove('selected');
+          radio.style.borderColor = 'rgba(255,255,255,0.25)';
+          radio.querySelector('div').style.background = 'transparent';
+        }
+      });
+
+      // Show/hide expanded sections
+      var nbExpanded = document.getElementById('netbanking-expanded');
+      var codExpanded = document.getElementById('cod-expanded');
+      if (method === 'netbanking') {
+        nbExpanded.style.display = 'block';
+        codExpanded.style.display = 'none';
+      } else if (method === 'cod') {
+        codExpanded.style.display = 'block';
+        nbExpanded.style.display = 'none';
+      } else {
+        nbExpanded.style.display = 'none';
+        codExpanded.style.display = 'none';
+      }
+
+      selectedPayment = method;
+    }
+
+    function selectUPI(app, event) {
+      event.stopPropagation();
+      // Make sure UPI payment is selected
+      selectPayment('upi');
+      // Select UPI app
+      var apps = ['gpay', 'phonepe', 'paytm'];
+      apps.forEach(function(a) {
+        var el = document.getElementById('upi-' + a);
+        if (a === app) {
+          el.classList.add('selected');
+        } else {
+          el.classList.remove('selected');
+        }
+      });
+      selectedUPIApp = app;
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en" style="height: auto; min-height: 100%;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MERCBEX – Home Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link id="heading-font-link" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link id="body-font-link" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['var(--font-heading-name)', 'sans-serif'],
+            body: ['var(--font-body-name)', 'sans-serif'],
+          },
+          spacing: {
+            base: 'var(--space-base)',
+          },
+          borderRadius: {
+            small: 'var(--radius-small)',
+            large: 'var(--radius-large)',
+          },
+          boxShadow: {
+            custom: 'var(--shadow-custom)',
+            'custom-hover': 'var(--shadow-custom-hover)',
+          },
+          colors: {
+            brand: {
+              dark: '#0F3D22',
+              mid: '#1A5C34',
+              light: '#2A7A48',
+              lime: '#A8E63D',
+              'lime-bright': '#C4F135',
+              'lime-soft': '#D4F76A',
+              'lime-pale': '#E8FBAA',
+            }
+          },
+          keyframes: {
+            progressLine: {
+              '0%': { width: '0%' },
+              '100%': { width: '100%' },
+            },
+            glowPulse: {
+              '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+              '50%': { opacity: '1', transform: 'scale(1.08)' },
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(24px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% center' },
+              '100%': { backgroundPosition: '200% center' },
+            },
+            ringExpand: {
+              '0%': { transform: 'scale(0.85)', opacity: '0.8' },
+              '100%': { transform: 'scale(1.35)', opacity: '0' },
+            }
+          },
+          animation: {
+            progressLine: 'progressLine 3.2s cubic-bezier(0.4,0,0.2,1) forwards',
+            glowPulse: 'glowPulse 2.8s ease-in-out infinite',
+            fadeUp: 'fadeUp 0.9s ease-out forwards',
+            'fadeUp-delay': 'fadeUp 0.9s ease-out 0.4s forwards',
+            'fadeUp-delay2': 'fadeUp 0.9s ease-out 0.7s forwards',
+            shimmer: 'shimmer 2.5s linear infinite',
+            ringExpand: 'ringExpand 2.4s ease-out infinite',
+            'ringExpand-delay': 'ringExpand 2.4s ease-out 1.2s infinite',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --font-heading-name: 'Syne';
+      --font-body-name: 'DM Sans';
+      --font-heading: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --letter-spacing-heading: 0.5px;
+      --letter-spacing-body: 0px;
+
+      --space-base: 1rem;
+
+      --radius-small: 6px;
+      --radius-large: 16px;
+      --border-width: 1.5px;
+
+      --shadow-color: 168 230 61;
+      --shadow-offset-x: 0px;
+      --shadow-offset-y: 0px;
+      --shadow-blur: 48px;
+      --shadow-spread: 0px;
+      --shadow-opacity: 0.35;
+      --shadow-custom: 0px 0px 48px 0px rgba(168, 230, 61, 0.35);
+      --shadow-custom-hover: 0px 0px 72px 0px rgba(168, 230, 61, 0.55);
+    }
+
+    .logo-glow {
+      filter: drop-shadow(0 0 32px rgba(168, 230, 61, 0.7)) drop-shadow(0 0 64px rgba(168, 230, 61, 0.35));
+    }
+
+    .shimmer-text {
+      background: linear-gradient(90deg, #A8E63D 0%, #C4F135 30%, #ffffff 50%, #C4F135 70%, #A8E63D 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+    }
+
+    .progress-track {
+      background: rgba(168, 230, 61, 0.15);
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #A8E63D, #C4F135, #A8E63D);
+      box-shadow: 0 0 12px rgba(168, 230, 61, 0.8), 0 0 24px rgba(168, 230, 61, 0.4);
+      animation: progressLine 3.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .ring-1-anim {
+      animation: ringExpand 2.4s ease-out infinite;
+    }
+
+    .ring-2-anim {
+      animation: ringExpand 2.4s ease-out 1.2s infinite;
+    }
+
+    .tagline-hindi {
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Glassmorphism weather card */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 8px 32px rgba(15, 61, 34, 0.18), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+
+    /* Hero scan banner */
+    .scan-banner {
+      background: linear-gradient(135deg, #A8E63D 0%, #8BC34A 35%, #2A7A48 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .scan-banner::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+    }
+    .scan-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -30px;
+      left: 20px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* Crop chip active */
+    .crop-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: var(--radius-large);
+      border: 1.5px solid rgba(15,61,34,0.1);
+      background: #FFFFFF;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      min-width: 68px;
+    }
+    .crop-chip.active {
+      background: #0F3D22;
+      border-color: #A8E63D;
+      box-shadow: 0 0 16px rgba(168,230,61,0.25);
+    }
+    .crop-chip:hover:not(.active) {
+      border-color: rgba(168,230,61,0.5);
+      background: rgba(168,230,61,0.06);
+    }
+
+    /* Product card */
+    .product-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-large);
+      border: 1.5px solid rgba(15,61,34,0.08);
+      overflow: hidden;
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .product-card:hover {
+      box-shadow: 0 8px 32px rgba(15,61,34,0.12);
+      transform: translateY(-2px);
+    }
+
+    /* Add to cart button */
+    .add-cart-btn {
+      background: linear-gradient(135deg, #A8E63D 0%, #C4F135 100%);
+      border-radius: var(--radius-small);
+      padding: 8px 14px;
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: #0F3D22;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .add-cart-btn:hover {
+      box-shadow: 0 4px 16px rgba(168,230,61,0.5);
+      transform: translateY(-1px);
+    }
+    .add-cart-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Bottom nav */
+    .bottom-nav {
+      background: #FFFFFF;
+      border-top: 1px solid rgba(15,61,34,0.08);
+      box-shadow: 0 -4px 24px rgba(15,61,34,0.08);
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 0;
+      cursor: pointer;
+      flex: 1;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item.active .nav-icon-wrap {
+      background: rgba(168,230,61,0.15);
+      border-radius: 10px;
+    }
+
+    /* Scrollbar hide */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Section fade-in animations */
+    @keyframes sectionFadeUp {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .anim-1 { animation: sectionFadeUp 0.45s ease-out 0.05s both; }
+    .anim-2 { animation: sectionFadeUp 0.45s ease-out 0.12s both; }
+    .anim-3 { animation: sectionFadeUp 0.45s ease-out 0.20s both; }
+    .anim-4 { animation: sectionFadeUp 0.45s ease-out 0.28s both; }
+    .anim-5 { animation: sectionFadeUp 0.45s ease-out 0.36s both; }
+    .anim-6 { animation: sectionFadeUp 0.45s ease-out 0.44s both; }
+
+    /* Scan pulse ring */
+    @keyframes scanPulse {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.12); opacity: 1; }
+    }
+    .scan-pulse { animation: scanPulse 1.8s ease-in-out infinite; }
+
+    /* Weather icon float */
+    @keyframes weatherFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+    .weather-float { animation: weatherFloat 3s ease-in-out infinite; }
+
+    /* Badge dot pulse */
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .dot-pulse { animation: dotPulse 1.5s ease-in-out infinite; }
+
+    /* Notification badge */
+    .notif-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #FF4444;
+      border: 1.5px solid #F5F7F2;
+    }
+
+    /* Rating stars */
+    .star-filled { color: #F5A623; }
+    .star-empty { color: #E0E0E0; }
+
+    /* Tag badge */
+    .tag-badge {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="font-body" style="height: auto; min-height: 100%; background-color: #F5F7F2;">
+
+  <div class="flex flex-col" style="background-color: #F5F7F2; max-width: 430px; margin: 0 auto;">
+
+    <!-- ===== TOP STATUS BAR ===== -->
+    <div class="w-full flex items-center justify-between px-5 pt-10 pb-2" style="background-color: #F5F7F2;">
+      <!-- Logo -->
+      <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/splash-launch-screen" class="flex items-center gap-2" style="text-decoration: none;">
+        <div style="width: 26px; height: 28px;">
+          <svg width="26" height="28" viewBox="0 0 110 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M55 4L8 22V58C8 84.5 28.5 108.5 55 116C81.5 108.5 102 84.5 102 58V22L55 4Z" fill="#1A5C34" stroke="#A8E63D" stroke-width="2.5"/>
+            <path d="M55 12L16 27V58C16 80.5 33 101.5 55 108C77 101.5 94 80.5 94 58V27L55 12Z" fill="#0F3D22" opacity="0.6"/>
+            <path d="M55 30C55 30 38 42 38 60C38 72.5 45.5 80 55 82C64.5 80 72 72.5 72 60C72 42 55 30 55 30Z" fill="#A8E63D" opacity="0.95"/>
+            <line x1="55" y1="32" x2="55" y2="80" stroke="#0F3D22" stroke-width="2" stroke-linecap="round"/>
+            <path d="M55 50 Q47 54 42 62" stroke="#0F3D22" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <path d="M55 50 Q63 54 68 62" stroke="#0F3D22" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          </svg>
+        </div>
+        <span class="font-heading" style="font-size: 16px; font-weight: 800; color: #0F3D22; letter-spacing: 3px;">MERCBEX</span>
+      </a>
+
+      <!-- Right: Notification + Cart -->
+      <div class="flex items-center gap-3">
+        <!-- Notification bell -->
+        <div style="position: relative; width: 38px; height: 38px; border-radius: 10px; background: #FFFFFF; border: 1.5px solid rgba(15,61,34,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 2C9 2 5 4 5 9V13H13V9C13 4 9 2 9 2Z" stroke="#0F3D22" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M7.5 13C7.5 13.8284 8.17157 14.5 9 14.5C9.82843 14.5 10.5 13.8284 10.5 13" stroke="#0F3D22" stroke-width="1.5"/>
+            <line x1="9" y1="2" x2="9" y2="1" stroke="#0F3D22" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <div class="notif-badge dot-pulse"></div>
+        </div>
+        <!-- Cart -->
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/cart-checkout" style="position: relative; width: 38px; height: 38px; border-radius: 10px; background: #0F3D22; border: 1.5px solid #0F3D22; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none;">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M2 2H4L5.5 11H13.5L15 5H5.5" stroke="#A8E63D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="7" cy="14" r="1.2" fill="#A8E63D"/>
+            <circle cx="12" cy="14" r="1.2" fill="#A8E63D"/>
+          </svg>
+          <div style="position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; border-radius: 50%; background: #A8E63D; border: 1.5px solid #F5F7F2; display: flex; align-items: center; justify-content: center;">
+            <span class="font-heading" style="font-size: 9px; font-weight: 800; color: #0F3D22;">3</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- ===== GREETING ROW ===== -->
+    <section class="px-5 pt-3 pb-4 anim-1" style="max-height: 120px;">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="font-body" style="font-size: 12px; color: rgba(15,61,34,0.45); font-weight: 500; letter-spacing: 0.3px; margin-bottom: 2px;">Good Morning 🌱</p>
+          <h1 class="font-heading" style="font-size: 24px; font-weight: 800; color: #0F3D22; letter-spacing: 0.3px; line-height: 1.15;">Ramesh Kumar</h1>
+          <div class="flex items-center gap-1.5 mt-1">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+              <path d="M5.5 1C4.12 1 3 2.12 3 3.5C3 5.5 5.5 9 5.5 9C5.5 9 8 5.5 8 3.5C8 2.12 6.88 1 5.5 1Z" fill="#A8E63D"/>
+              <circle cx="5.5" cy="3.5" r="1" fill="#0F3D22"/>
+            </svg>
+            <span class="font-body" style="font-size: 11px; color: rgba(15,61,34,0.45); font-weight: 500;">Nashik, Maharashtra · 2.5 acres</span>
+          </div>
+        </div>
+        <!-- Avatar -->
+        <div style="position: relative;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; overflow: hidden; border: 2.5px solid #A8E63D; box-shadow: 0 0 16px rgba(168,230,61,0.3);">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="Ramesh Kumar" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <!-- Online dot -->
+          <div style="position: absolute; bottom: 1px; right: 1px; width: 12px; height: 12px; border-radius: 50%; background: #A8E63D; border: 2px solid #F5F7F2; box-shadow: 0 0 6px rgba(168,230,61,0.7);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GLASSMORPHISM WEATHER CARD ===== -->
+    <section class="px-5 pb-4 anim-2" style="max-height: 180px;">
+      <div class="glass-card rounded-large p-4" style="background: linear-gradient(135deg, #1A5C34 0%, #0F3D22 60%, #2A7A48 100%); position: relative; overflow: hidden;">
+        <!-- Background decorative circles -->
+        <div style="position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(168,230,61,0.08);"></div>
+        <div style="position: absolute; bottom: -20px; left: 40px; width: 80px; height: 80px; border-radius: 50%; background: rgba(168,230,61,0.05);"></div>
+
+        <div class="flex items-center justify-between" style="position: relative; z-index: 2;">
+          <!-- Left: Weather info -->
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <div style="width: 6px; height: 6px; border-radius: 50%; background: #A8E63D;" class="dot-pulse"></div>
+              <span class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.8); font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;">Live Weather</span>
+            </div>
+            <div class="flex items-end gap-2">
+              <span class="font-heading" style="font-size: 42px; font-weight: 800; color: #FFFFFF; line-height: 1; letter-spacing: -1px;">28°</span>
+              <div style="padding-bottom: 6px;">
+                <p class="font-body" style="font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 500; line-height: 1.3;">Partly Cloudy</p>
+                <p class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.7); font-weight: 400;">Nashik, MH</p>
+              </div>
+            </div>
+            <!-- Weather stats row -->
+            <div class="flex items-center gap-4 mt-2">
+              <div class="flex items-center gap-1">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M5.5 1V7M5.5 7C5.5 8.38 4.38 9.5 3 9.5C1.62 9.5 0.5 8.38 0.5 7C0.5 5.62 1.62 4.5 3 4.5" stroke="rgba(168,230,61,0.8)" stroke-width="1.2" stroke-linecap="round"/>
+                  <circle cx="5.5" cy="8" r="1.5" fill="rgba(168,230,61,0.8)"/>
+                </svg>
+                <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.6);">72% Humidity</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <path d="M1 5.5C1 5.5 2.5 2 5.5 2C8.5 2 10 5.5 10 5.5C10 5.5 8.5 9 5.5 9C2.5 9 1 5.5 1 5.5Z" stroke="rgba(168,230,61,0.8)" stroke-width="1.2"/>
+                  <circle cx="5.5" cy="5.5" r="1.5" fill="rgba(168,230,61,0.8)"/>
+                </svg>
+                <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.6);">12 km/h Wind</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Weather icon + forecast -->
+          <div class="flex flex-col items-center gap-3">
+            <!-- Sun/cloud icon -->
+            <div class="weather-float" style="width: 64px; height: 64px; position: relative;">
+              <!-- Sun -->
+              <div style="position: absolute; top: 4px; right: 4px; width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #FFD700, #FFA500); box-shadow: 0 0 16px rgba(255,215,0,0.5);"></div>
+              <!-- Cloud -->
+              <div style="position: absolute; bottom: 4px; left: 0; width: 48px; height: 26px; background: rgba(255,255,255,0.9); border-radius: 13px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"></div>
+              <div style="position: absolute; bottom: 14px; left: 8px; width: 26px; height: 22px; background: rgba(255,255,255,0.9); border-radius: 50%;"></div>
+              <div style="position: absolute; bottom: 14px; left: 20px; width: 20px; height: 18px; background: rgba(255,255,255,0.9); border-radius: 50%;"></div>
+            </div>
+
+            <!-- Mini forecast -->
+            <div class="flex gap-2">
+              <div class="flex flex-col items-center gap-0.5">
+                <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.45);">Tue</span>
+                <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.75); font-weight: 600;">31°</span>
+              </div>
+              <div class="flex flex-col items-center gap-0.5">
+                <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.45);">Wed</span>
+                <span class="font-body" style="font-size: 10px; color: rgba(255,255,255,0.75); font-weight: 600;">26°</span>
+              </div>
+              <div class="flex flex-col items-center gap-0.5">
+                <span class="font-body" style="font-size: 9px; color: rgba(255,255,255,0.45);">Thu</span>
+                <span class="font-body" style="font-size: 10px; color: rgba(168,230,61,0.9); font-weight: 700;">🌧 24°</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert strip -->
+        <div class="flex items-center gap-2 mt-3 pt-3" style="border-top: 1px solid rgba(255,255,255,0.1); position: relative; z-index: 2;">
+          <div style="width: 5px; height: 5px; border-radius: 50%; background: #FFD700;" class="dot-pulse"></div>
+          <span class="font-body" style="font-size: 10.5px; color: rgba(255,255,255,0.6); font-weight: 400;">Rain expected Thursday · Good time to apply fungicide</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== HERO SCAN CTA BANNER ===== -->
+    <section class="px-5 pb-4 anim-3" style="max-height: 160px;">
+      <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/crop-scan-screen" class="scan-banner rounded-large flex items-center justify-between p-4" style="text-decoration: none; min-height: 100px;">
+        <!-- Left content -->
+        <div style="position: relative; z-index: 2; flex: 1;">
+          <div class="flex items-center gap-2 mb-1">
+            <div style="width: 5px; height: 5px; border-radius: 50%; background: rgba(15,61,34,0.5);"></div>
+            <span class="font-body" style="font-size: 10px; font-weight: 700; color: rgba(15,61,34,0.65); letter-spacing: 1.5px; text-transform: uppercase;">AI Powered</span>
+          </div>
+          <h2 class="font-heading" style="font-size: 20px; font-weight: 800; color: #0F3D22; line-height: 1.2; letter-spacing: 0.3px;">Scan Your Crop</h2>
+          <p class="font-body mt-1" style="font-size: 11.5px; color: rgba(15,61,34,0.65); line-height: 1.4; max-width: 180px;">Detect diseases instantly with AI. Get treatment recommendations.</p>
+          <!-- CTA pill -->
+          <div class="flex items-center gap-1.5 mt-3" style="background: #0F3D22; border-radius: 20px; padding: 6px 14px; display: inline-flex;">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <rect x="1" y="1" width="11" height="11" rx="2" stroke="#A8E63D" stroke-width="1.3"/>
+              <path d="M1 4H4M1 9H4M9 1V4M9 9V12" stroke="#A8E63D" stroke-width="1.3" stroke-linecap="round"/>
+              <circle cx="6.5" cy="6.5" r="1.5" fill="#A8E63D"/>
+            </svg>
+            <span class="font-heading" style="font-size: 11px; font-weight: 700; color: #A8E63D; letter-spacing: 0.5px;">Scan Now →</span>
+          </div>
+        </div>
+
+        <!-- Right: Scan icon with pulse rings -->
+        <div style="position: relative; z-index: 2; width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <!-- Pulse rings -->
+          <div class="scan-pulse" style="position: absolute; width: 80px; height: 80px; border-radius: 50%; border: 2px solid rgba(15,61,34,0.2);"></div>
+          <div style="position: absolute; width: 64px; height: 64px; border-radius: 50%; border: 1.5px solid rgba(15,61,34,0.15); animation: scanPulse 1.8s ease-in-out 0.6s infinite;"></div>
+          <!-- Center scan icon -->
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: #0F3D22; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(15,61,34,0.3);">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+              <rect x="2" y="2" width="22" height="22" rx="4" stroke="#A8E63D" stroke-width="1.8"/>
+              <path d="M2 8H6M2 18H6M20 2V6M20 20V24" stroke="#A8E63D" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="13" cy="13" r="4" stroke="#A8E63D" stroke-width="1.5"/>
+              <circle cx="13" cy="13" r="1.5" fill="#A8E63D"/>
+            </svg>
+          </div>
+        </div>
+      </a>
+    </section>
+
+    <!-- ===== CROP CHIPS ROW ===== -->
+    <section class="pb-4 anim-4" style="max-height: 130px;">
+      <div class="flex items-center justify-between px-5 mb-3">
+        <h3 class="font-heading" style="font-size: 15px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">My Crops</h3>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/onboarding-crop-selection" class="font-body" style="font-size: 11.5px; color: #2A7A48; font-weight: 600; text-decoration: none; letter-spacing: 0.3px;">Edit Crops →</a>
+      </div>
+      <div class="flex gap-3 px-5 hide-scrollbar" style="overflow-x: auto; padding-bottom: 4px;">
+        <!-- Chip: Wheat (active) -->
+        <div class="crop-chip active" onclick="setActiveCrop(this)">
+          <div style="width: 32px; height: 32px; border-radius: 8px; overflow: hidden; background: rgba(168,230,61,0.15); display: flex; align-items: center; justify-content: center;">
+            <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=64&h=64&fit=crop" alt="Wheat" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px; opacity: 0.85;">
+          </div>
+          <span class="font-body" style="font-size: 10px; font-weight: 600; color: #A8E63D; letter-spacing: 0.3px;">Wheat</span>
+        </div>
+        <!-- Chip: Tomato -->
+        <div class="crop-chip" onclick="setActiveCrop(this)">
+          <div style="width: 32px; height: 32px; border-radius: 8px; overflow: hidden; background: rgba(15,61,34,0.05); display: flex; align-items: center; justify-content: center;">
+            <img src="https://images.unsplash.com/photo-1546094096-0df4bcaaa337?w=64&h=64&fit=crop" alt="Tomato" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+          </div>
+          <span class="font-body" style="font-size: 10px; font-weight: 600; color: rgba(15,61,34,0.55); letter-spacing: 0.3px;">Tomato</span>
+        </div>
+        <!-- Chip: Onion -->
+        <div class="crop-chip" onclick="setActiveCrop(this)">
+          <div style="width: 32px; height: 32px; border-radius: 8px; overflow: hidden; background: rgba(15,61,34,0.05); display: flex; align-items: center; justify-content: center;">
+            <img src="https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=64&h=64&fit=crop" alt="Onion" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+          </div>
+          <span class="font-body" style="font-size: 10px; font-weight: 600; color: rgba(15,61,34,0.55); letter-spacing: 0.3px;">Onion</span>
+        </div>
+        <!-- Chip: Soybean -->
+        <div class="crop-chip" onclick="setActiveCrop(this)">
+          <div style="width: 32px; height: 32px; border-radius: 8px; overflow: hidden; background: rgba(15,61,34,0.05); display: flex; align-items: center; justify-content: center;">
+            <img src="https://images.unsplash.com/photo-1601493700631-2b16ec4b4716?w=64&h=64&fit=crop" alt="Soybean" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+          </div>
+          <span class="font-body" style="font-size: 10px; font-weight: 600; color: rgba(15,61,34,0.55); letter-spacing: 0.3px;">Soybean</span>
+        </div>
+        <!-- Chip: Cotton -->
+        <div class="crop-chip" onclick="setActiveCrop(this)">
+          <div style="width: 32px; height: 32px; border-radius: 8px; overflow: hidden; background: rgba(15,61,34,0.05); display: flex; align-items: center; justify-content: center;">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=64&h=64&fit=crop" alt="Cotton" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
+          </div>
+          <span class="font-body" style="font-size: 10px; font-weight: 600; color: rgba(15,61,34,0.55); letter-spacing: 0.3px;">Cotton</span>
+        </div>
+        <!-- Chip: + Add -->
+        <div class="crop-chip" style="border-style: dashed; border-color: rgba(168,230,61,0.4); background: rgba(168,230,61,0.04);">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(168,230,61,0.1); display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 3V13M3 8H13" stroke="#A8E63D" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 10px; font-weight: 600; color: rgba(168,230,61,0.7); letter-spacing: 0.3px;">Add</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== RECOMMENDED PESTICIDE PRODUCTS ===== -->
+    <section class="px-5 pb-4 anim-5" style="max-height: 900px;">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h3 class="font-heading" style="font-size: 15px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Recommended for Wheat</h3>
+          <p class="font-body" style="font-size: 10.5px; color: rgba(15,61,34,0.45); margin-top: 1px;">Based on your crop & region</p>
+        </div>
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/product-detail-page" class="font-body" style="font-size: 11.5px; color: #2A7A48; font-weight: 600; text-decoration: none; letter-spacing: 0.3px;">See All →</a>
+      </div>
+
+      <!-- Product Card 1 -->
+      <div class="product-card mb-3 anim-5">
+        <div class="flex" style="min-height: 130px;">
+          <!-- Product image -->
+          <div style="width: 110px; flex-shrink: 0; position: relative; overflow: hidden; background: linear-gradient(135deg, #E8F5E9, #F1F8E9);">
+            <img src="https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=220&h=260&fit=crop" alt="Fungicide Pro" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
+            <!-- Tag -->
+            <div style="position: absolute; top: 8px; left: 8px;">
+              <span class="tag-badge font-body" style="background: #0F3D22; color: #A8E63D;">Best Seller</span>
+            </div>
+          </div>
+          <!-- Product info -->
+          <div class="flex flex-col justify-between p-3 flex-1">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <h4 class="font-heading" style="font-size: 13.5px; font-weight: 700; color: #0F3D22; line-height: 1.2; letter-spacing: 0.2px;">FungiShield Pro</h4>
+                  <p class="font-body mt-0.5" style="font-size: 10.5px; color: rgba(15,61,34,0.5);">Systemic Fungicide · 250ml</p>
+                </div>
+                <!-- Wishlist -->
+                <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(15,61,34,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 12C7 12 1.5 8.5 1.5 4.5C1.5 3 2.5 2 4 2C5 2 6 2.5 7 3.5C8 2.5 9 2 10 2C11.5 2 12.5 3 12.5 4.5C12.5 8.5 7 12 7 12Z" stroke="#0F3D22" stroke-width="1.3" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <!-- Rating -->
+              <div class="flex items-center gap-1 mt-1.5">
+                <div class="flex gap-0.5">
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-empty" style="font-size: 11px;">★</span>
+                </div>
+                <span class="font-body" style="font-size: 10px; color: rgba(15,61,34,0.4);">(248)</span>
+              </div>
+              <!-- Tags -->
+              <div class="flex gap-1.5 mt-2 flex-wrap">
+                <span class="tag-badge font-body" style="background: rgba(168,230,61,0.12); color: #1A5C34;">Wheat</span>
+                <span class="tag-badge font-body" style="background: rgba(168,230,61,0.12); color: #1A5C34;">Fungal</span>
+              </div>
+            </div>
+            <!-- Price + Cart -->
+            <div class="flex items-center justify-between mt-2">
+              <div>
+                <span class="font-heading" style="font-size: 16px; font-weight: 800; color: #0F3D22;">₹485</span>
+                <span class="font-body" style="font-size: 10px; color: rgba(15,61,34,0.35); text-decoration: line-through; margin-left: 4px;">₹620</span>
+                <div style="display: inline-block; margin-left: 4px; background: rgba(255,80,80,0.1); border-radius: 4px; padding: 1px 5px;">
+                  <span class="font-body" style="font-size: 9px; font-weight: 700; color: #E53935;">-22%</span>
+                </div>
+              </div>
+              <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/cart-checkout" class="add-cart-btn">+ Cart</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Card 2 -->
+      <div class="product-card mb-3 anim-6">
+        <div class="flex" style="min-height: 130px;">
+          <!-- Product image -->
+          <div style="width: 110px; flex-shrink: 0; position: relative; overflow: hidden; background: linear-gradient(135deg, #E3F2FD, #EDE7F6);">
+            <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=220&h=260&fit=crop" alt="Insecticide Max" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
+            <!-- Tag -->
+            <div style="position: absolute; top: 8px; left: 8px;">
+              <span class="tag-badge font-body" style="background: #A8E63D; color: #0F3D22;">New</span>
+            </div>
+          </div>
+          <!-- Product info -->
+          <div class="flex flex-col justify-between p-3 flex-1">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <h4 class="font-heading" style="font-size: 13.5px; font-weight: 700; color: #0F3D22; line-height: 1.2; letter-spacing: 0.2px;">InsectGuard Max</h4>
+                  <p class="font-body mt-0.5" style="font-size: 10.5px; color: rgba(15,61,34,0.5);">Contact Insecticide · 500ml</p>
+                </div>
+                <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(15,61,34,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 12C7 12 1.5 8.5 1.5 4.5C1.5 3 2.5 2 4 2C5 2 6 2.5 7 3.5C8 2.5 9 2 10 2C11.5 2 12.5 3 12.5 4.5C12.5 8.5 7 12 7 12Z" stroke="#0F3D22" stroke-width="1.3" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="flex items-center gap-1 mt-1.5">
+                <div class="flex gap-0.5">
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                </div>
+                <span class="font-body" style="font-size: 10px; color: rgba(15,61,34,0.4);">(89)</span>
+              </div>
+              <div class="flex gap-1.5 mt-2 flex-wrap">
+                <span class="tag-badge font-body" style="background: rgba(168,230,61,0.12); color: #1A5C34;">Wheat</span>
+                <span class="tag-badge font-body" style="background: rgba(168,230,61,0.12); color: #1A5C34;">Aphids</span>
+                <span class="tag-badge font-body" style="background: rgba(168,230,61,0.12); color: #1A5C34;">Organic</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-2">
+              <div>
+                <span class="font-heading" style="font-size: 16px; font-weight: 800; color: #0F3D22;">₹320</span>
+                <span class="font-body" style="font-size: 10px; color: rgba(15,61,34,0.35); text-decoration: line-through; margin-left: 4px;">₹380</span>
+                <div style="display: inline-block; margin-left: 4px; background: rgba(255,80,80,0.1); border-radius: 4px; padding: 1px 5px;">
+                  <span class="font-body" style="font-size: 9px; font-weight: 700; color: #E53935;">-16%</span>
+                </div>
+              </div>
+              <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/cart-checkout" class="add-cart-btn">+ Cart</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Card 3 -->
+      <div class="product-card mb-3">
+        <div class="flex" style="min-height: 130px;">
+          <!-- Product image -->
+          <div style="width: 110px; flex-shrink: 0; position: relative; overflow: hidden; background: linear-gradient(135deg, #FFF8E1, #FFF3E0);">
+            <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=220&h=260&fit=crop" alt="Herbicide Clear" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
+            <!-- Tag -->
+            <div style="position: absolute; top: 8px; left: 8px;">
+              <span class="tag-badge font-body" style="background: rgba(255,165,0,0.9); color: #FFFFFF;">Low Stock</span>
+            </div>
+          </div>
+          <!-- Product info -->
+          <div class="flex flex-col justify-between p-3 flex-1">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <h4 class="font-heading" style="font-size: 13.5px; font-weight: 700; color: #0F3D22; line-height: 1.2; letter-spacing: 0.2px;">WeedClear Ultra</h4>
+                  <p class="font-body mt-0.5" style="font-size: 10.5px; color: rgba(15,61,34,0.5);">Selective Herbicide · 1L</p>
+                </div>
+                <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(168,230,61,0.12); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 12C7 12 1.5 8.5 1.5 4.5C1.5 3 2.5 2 4 2C5 2 6 2.5 7 3.5C8 2.5 9 2 10 2C11.5 2 12.5 3 12.5 4.5C12.5 8.5 7 12 7 12Z" fill="#A8E63D" stroke="#A8E63D" stroke-width="1.3" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="flex items-center gap-1 mt-1.5">
+                <div class="flex gap-0.5">
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-empty" style="font-size: 11px;">★</span>
+                </div>
+                <span class="font-body" style="font-size: 10px; color: rgba(15,61,34,0.4);">(156)</span>
+              </div>
+              <div class="flex gap-1.5 mt-2 flex-wrap">
+                <span class="tag-badge font-body" style="background: rgba(168,230,61,0.12); color: #1A5C34;">Wheat</span>
+                <span class="tag-badge font-body" style="background: rgba(168,230,61,0.12); color: #1A5C34;">Weed</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-2">
+              <div>
+                <span class="font-heading" style="font-size: 16px; font-weight: 800; color: #0F3D22;">₹750</span>
+                <span class="font-body" style="font-size: 10px; color: rgba(15,61,34,0.35); text-decoration: line-through; margin-left: 4px;">₹920</span>
+                <div style="display: inline-block; margin-left: 4px; background: rgba(255,80,80,0.1); border-radius: 4px; padding: 1px 5px;">
+                  <span class="font-body" style="font-size: 9px; font-weight: 700; color: #E53935;">-18%</span>
+                </div>
+              </div>
+              <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/cart-checkout" class="add-cart-btn">+ Cart</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Card 4 -->
+      <div class="product-card mb-3">
+        <div class="flex" style="min-height: 130px;">
+          <!-- Product image -->
+          <div style="width: 110px; flex-shrink: 0; position: relative; overflow: hidden; background: linear-gradient(135deg, #E8F5E9, #E0F2F1);">
+            <img src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=220&h=260&fit=crop" alt="Nutrient Boost" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
+            <div style="position: absolute; top: 8px; left: 8px;">
+              <span class="tag-badge font-body" style="background: #0F3D22; color: #A8E63D;">Top Rated</span>
+            </div>
+          </div>
+          <div class="flex flex-col justify-between p-3 flex-1">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <h4 class="font-heading" style="font-size: 13.5px; font-weight: 700; color: #0F3D22; line-height: 1.2; letter-spacing: 0.2px;">NutriBoost NPK</h4>
+                  <p class="font-body mt-0.5" style="font-size: 10.5px; color: rgba(15,61,34,0.5);">Liquid Fertilizer · 1L</p>
+                </div>
+                <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(15,61,34,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M7 12C7 12 1.5 8.5 1.5 4.5C1.5 3 2.5 2 4 2C5 2 6 2.5 7 3.5C8 2.5 9 2 10 2C11.5 2 12.5 3 12.5 4.5C12.5 8.5 7 12 7 12Z" stroke="#0F3D22" stroke-width="1.3" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="flex items-center gap-1 mt-1.5">
+                <div class="flex gap-0.5">
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                  <span class="star-filled" style="font-size: 11px;">★</span>
+                </div>
+                <span class="font-body" style="font-size: 10px; color: rgba(15,61,34,0.4);">(312)</span>
+              </div>
+              <div class="flex gap-1.5 mt-2 flex-wrap">
+                <span class="tag-badge font-body" style="background: rgba(168,230,61,0.12); color: #1A5C34;">All Crops</span>
+                <span class="tag-badge font-body" style="background: rgba(168,230,61,0.12); color: #1A5C34;">Growth</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between mt-2">
+              <div>
+                <span class="font-heading" style="font-size: 16px; font-weight: 800; color: #0F3D22;">₹290</span>
+                <span class="font-body" style="font-size: 10px; color: rgba(15,61,34,0.35); text-decoration: line-through; margin-left: 4px;">₹350</span>
+                <div style="display: inline-block; margin-left: 4px; background: rgba(255,80,80,0.1); border-radius: 4px; padding: 1px 5px;">
+                  <span class="font-body" style="font-size: 9px; font-weight: 700; color: #E53935;">-17%</span>
+                </div>
+              </div>
+              <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/cart-checkout" class="add-cart-btn">+ Cart</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom padding for nav -->
+      <div style="height: 80px;"></div>
+    </section>
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <div class="bottom-nav w-full" style="position: sticky; bottom: 0; z-index: 50;">
+      <div class="flex items-center justify-around px-2">
+
+        <!-- Home (Active) -->
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/home-dashboard" class="nav-item active" style="text-decoration: none;">
+          <div class="nav-icon-wrap" style="padding: 6px 14px; border-radius: 10px; background: rgba(168,230,61,0.15);">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M3 9.5L11 3L19 9.5V19C19 19.55 18.55 20 18 20H14V15H8V20H4C3.45 20 3 19.55 3 19V9.5Z" fill="#0F3D22" stroke="#0F3D22" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 10px; font-weight: 700; color: #0F3D22; letter-spacing: 0.3px;">Home</span>
+        </a>
+
+        <!-- Scan -->
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/crop-scan-screen" class="nav-item" style="text-decoration: none;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #A8E63D, #C4F135); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(168,230,61,0.45); margin-top: -18px; border: 3px solid #F5F7F2;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="3" stroke="#0F3D22" stroke-width="2"/>
+              <path d="M3 8H7M3 16H7M17 3V7M17 17V21" stroke="#0F3D22" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="12" cy="12" r="3" stroke="#0F3D22" stroke-width="1.8"/>
+              <circle cx="12" cy="12" r="1" fill="#0F3D22"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 10px; font-weight: 600; color: rgba(15,61,34,0.5); letter-spacing: 0.3px; margin-top: 2px;">Scan</span>
+        </a>
+
+        <!-- Shop -->
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/product-detail-page" class="nav-item" style="text-decoration: none;">
+          <div style="padding: 6px 14px;">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M3 3H5L6.5 12H15.5L17 6H6.5" stroke="rgba(15,61,34,0.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="8.5" cy="15.5" r="1.5" fill="rgba(15,61,34,0.4)"/>
+              <circle cx="13.5" cy="15.5" r="1.5" fill="rgba(15,61,34,0.4)"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 10px; font-weight: 600; color: rgba(15,61,34,0.4); letter-spacing: 0.3px;">Shop</span>
+        </a>
+
+        <!-- Profile -->
+        <a href="/api/copilot/prototype/7a9511ae-1a13-4561-8b0f-55d291c7aa2e/profile-settings" class="nav-item" style="text-decoration: none;">
+          <div style="padding: 6px 14px;">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="7" r="4" stroke="rgba(15,61,34,0.4)" stroke-width="1.8"/>
+              <path d="M3 19C3 15.686 6.686 13 11 13C15.314 13 19 15.686 19 19" stroke="rgba(15,61,34,0.4)" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="font-body" style="font-size: 10px; font-weight: 600; color: rgba(15,61,34,0.4); letter-spacing: 0.3px;">Profile</span>
+        </a>
+
+      </div>
+      <!-- Safe area indicator -->
+      <div class="flex items-center justify-center pb-3 pt-1">
+        <div style="width: 120px; height: 4px; border-radius: 2px; background: rgba(15,61,34,0.1);"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Crop chip selection
+    function setActiveCrop(el) {
+      document.querySelectorAll('.crop-chip').forEach(function(chip) {
+        chip.classList.remove('active');
+        const label = chip.querySelector('span');
+        if (label) label.style.color = 'rgba(15,61,34,0.55)';
+      });
+      el.classList.add('active');
+      const label = el.querySelector('span');
+      if (label) label.style.color = '#A8E63D';
+    }
+
+    // Add to cart feedback
+    document.querySelectorAll('.add-cart-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        const original = this.textContent;
+        this.textContent = '✓ Added';
+        this.style.background = '#0F3D22';
+        this.style.color = '#A8E63D';
+        const self = this;
+        setTimeout(function() {
+          self.textContent = original;
+          self.style.background = '';
+          self.style.color = '';
+        }, 1500);
+      });
+    });
+  </script>
+
+</body>
+</html>
